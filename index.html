@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>لغزك | Lghzak - لعبة الألغاز والتحديات</title>
   
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Cairo & El Messiri -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=El+Messiri:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
@@ -20,7 +24,10 @@
             brand: { 50: '#fff7ed', 100: '#ffedd5', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 900: '#7c2d12' },
             game: { bg: '#0f0914', card: '#1b1128', accent: '#ff9900', gold: '#ffd700', darkBg: '#09040d' }
           },
-          fontFamily: { cairo: ['Cairo', 'sans-serif'], messiri: ['El Messiri', 'serif'] }
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            messiri: ['El Messiri', 'serif']
+          }
         }
       }
     }
@@ -48,6 +55,9 @@
     @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
     .animate-float { animation: float 3s ease-in-out infinite; }
     
+    .owner-gold-frame { border: 2px solid #ffd700 !important; box-shadow: 0 0 15px #ffd700, inset 0 0 10px #ffd700 !important; animation: goldGlow 2s infinite alternate; }
+    @keyframes goldGlow { from { box-shadow: 0 0 5px #f59e0b; } to { box-shadow: 0 0 15px #fbbf24; } }
+    
     .letter-slot { width: 2.8rem; height: 3.2rem; background: rgba(0, 0, 0, 0.5); border: 2px solid rgba(249, 115, 22, 0.4); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; color: #fbbf24; cursor: pointer; transition: all 0.2s; }
     .letter-btn { background: linear-gradient(180deg, #374151 0%, #1f2937 100%); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 0 #111827; border-radius: 0.75rem; font-weight: 800; transition: transform 0.1s; height: 3rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
     .letter-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #111827; }
@@ -61,7 +71,8 @@
     <!-- Toast -->
     <div id="toast-container" class="absolute top-14 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4">
       <div id="toast-msg" class="hidden bg-gray-900/95 text-white border border-brand-500/50 px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 -translate-y-10 opacity-0 pointer-events-auto">
-        <span id="toast-icon">✨</span><span id="toast-text">مرحباً بك!</span>
+        <span id="toast-icon">✨</span>
+        <span id="toast-text">مرحباً بك!</span>
       </div>
     </div>
 
@@ -87,125 +98,150 @@
     </header>
 
     <main id="main-content" class="flex-1 relative overflow-y-auto overflow-x-hidden">
-      <!-- SPLASH -->
+      <!-- 1. SPLASH -->
       <section id="screen-splash" class="absolute inset-0 flex flex-col items-center justify-between p-8 bg-gradient-to-b from-gray-950 via-game-darkBg to-brand-900/60 z-50">
         <div class="my-auto flex flex-col items-center text-center">
           <div class="relative mb-6">
-            <div class="w-28 h-28 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-yellow-400 flex items-center justify-center border-2 border-white/20 animate-pulse-glow">
+            <div class="w-28 h-28 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-glow-orange border-2 border-white/20 animate-pulse-glow">
               <span class="text-6xl animate-float">🧩</span>
             </div>
+            <span class="absolute -bottom-2 -right-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/20 shadow">الإصدار 4.0</span>
           </div>
           <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-amber-200 to-yellow-400 font-messiri tracking-wider">لغزك | Lghzak</h1>
-          <p class="text-xs text-gray-400 mt-2 font-bold">عالم الألغاز والتحديات الفاخرة</p>
+          <p class="text-xs text-gray-400 mt-2 font-bold tracking-wide">عوالم، نوادر، وتحديات أسطورية</p>
         </div>
         <div class="w-full max-w-xs flex flex-col items-center">
-          <div class="w-full bg-black/60 h-3.5 rounded-full overflow-hidden p-0.5 border border-white/10"><div id="loading-bar" class="bg-gradient-to-r from-brand-500 to-yellow-300 h-full w-0 rounded-full transition-all duration-300"></div></div>
-          <span class="text-[11px] text-brand-300 font-bold mt-2.5">تحميل العوالم والأحداث السحرية...</span>
+          <div class="w-full bg-black/60 h-3.5 rounded-full overflow-hidden p-0.5 border border-white/10 shadow-inner"><div id="loading-bar" class="bg-gradient-to-r from-brand-500 via-amber-400 to-yellow-300 h-full w-0 rounded-full transition-all duration-300 shadow-glow-orange"></div></div>
+          <span class="text-[11px] text-brand-300 font-bold mt-2.5">تحميل العوالم والأحداث...</span>
         </div>
       </section>
 
-      <!-- HOME -->
+      <!-- 2. HOME -->
       <section id="screen-home" class="hidden p-4 space-y-4 pb-20">
         <div class="relative rounded-3xl overflow-hidden glass-card p-5 border border-brand-500/30 text-center">
-          <span class="inline-block bg-brand-500/20 text-brand-400 border border-brand-500/40 text-[11px] font-black px-3 py-1 rounded-full mb-3">✨ لعبة الألغاز العربية</span>
+          <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 rounded-full blur-2xl"></div>
+          <span class="inline-block bg-brand-500/20 text-brand-400 border border-brand-500/40 text-[11px] font-black px-3 py-1 rounded-full mb-3">✨ لعبة الألغاز العربية الأولى</span>
           <h2 class="text-2xl font-black text-white font-messiri mb-1">جاهز لتحدي العقول؟</h2>
-          <p class="text-xs text-gray-300 mb-4 font-bold">انطلق في مغامرة شيقة عبر العوالم!</p>
+          <p class="text-xs text-gray-300 max-w-xs mx-auto mb-4 font-bold">انطلق في العوالم، وتصدر قائمة الأساطير!</p>
           <button onclick="playCurrentLevel()" class="w-full btn-3d-orange py-3.5 rounded-2xl font-black text-lg text-white flex items-center justify-center gap-2"><span>ابدأ اللعب الآن</span><i class="fa-solid fa-play text-sm"></i></button>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <button onclick="navigateTo('worlds')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-cyan-500/30 hover:border-cyan-400 transition"><span class="text-3xl mb-1">🗺️</span><span class="text-xs font-black text-white">العوالم والمراحل</span></button>
-          <button onclick="navigateTo('events')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-purple-500/30 hover:border-purple-400 transition"><span class="text-3xl mb-1">⚔️</span><span class="text-xs font-black text-white">الأحداث والتحديات</span></button>
-          <button onclick="navigateTo('shop')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-amber-500/30 hover:border-amber-400 transition"><span class="text-3xl mb-1">💎</span><span class="text-xs font-black text-white">متجر الألغاز</span></button>
-          <button onclick="navigateTo('leaderboard')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-yellow-500/30 hover:border-yellow-400 transition"><span class="text-3xl mb-1">🏆</span><span class="text-xs font-black text-white">الترتيب العالمي</span></button>
+          <button onclick="navigateTo('worlds')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-cyan-500/30 hover:border-cyan-400 transition"><span class="text-3xl mb-1">🗺️</span><span class="text-xs font-black text-white">العوالم والمراحل</span><span id="home-worlds-count" class="text-[10px] text-cyan-400 mt-0.5 font-bold">عوالم ساحرة</span></button>
+          <button onclick="navigateTo('events')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-purple-500/30 hover:border-purple-400 transition"><span class="text-3xl mb-1">⚔️</span><span class="text-xs font-black text-white">الأحداث والتحديات</span><span class="text-[10px] text-purple-300 mt-0.5 font-bold">جوائز يومية</span></button>
+          <button onclick="navigateTo('shop')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-amber-500/30 hover:border-amber-400 transition"><span class="text-3xl mb-1">💎</span><span class="text-xs font-black text-white">متجر الألغاز</span><span class="text-[10px] text-amber-400 mt-0.5 font-bold">ألقاب وصور رمزية</span></button>
+          <button onclick="navigateTo('leaderboard')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-yellow-500/30 hover:border-yellow-400 transition"><span class="text-3xl mb-1">🏆</span><span class="text-xs font-black text-white">الترتيب العالمي</span><span class="text-[10px] text-yellow-400 mt-0.5 font-bold">قائمة الأسطوريين</span></button>
         </div>
         <div class="glass-card p-4 rounded-2xl flex justify-between items-center border border-white/10">
-          <div class="flex items-center gap-3"><span class="text-2xl">🎁</span><div><h4 class="text-xs font-black text-white">لديك كود ترويجي؟</h4><p class="text-[10px] text-gray-400">استبدل الأكواد مباشرة هنا</p></div></div>
-          <button onclick="openRedeemModal()" class="btn-3d-purple px-3 py-1.5 rounded-xl text-xs font-black">إدخال كود</button>
+          <div class="flex items-center gap-3"><span class="text-2xl">🎁</span><div><h4 class="text-xs font-black text-white">كود هدايا؟</h4><p class="text-[10px] text-gray-400">استرد الرمز هنا</p></div></div>
+          <button onclick="openRedeemModal()" class="btn-3d-purple px-3 py-1.5 rounded-xl text-xs font-black">إدخال الكود</button>
         </div>
       </section>
 
-      <!-- WORLDS & LEVELS -->
+      <!-- 3. WORLDS -->
       <section id="screen-worlds" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">🗺️ عوالم الألغاز</h2></div>
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+            <h2 class="text-xl font-black text-white font-messiri flex items-center gap-1.5"><span>🗺️</span> عوالم الألغاز</h2>
+          </div>
+          <span id="worlds-total-badge" class="text-xs text-brand-400 font-bold bg-brand-500/10 border border-brand-500/30 px-3 py-1 rounded-full">0 عالم</span>
+        </div>
         <div id="worlds-grid" class="space-y-3"></div>
       </section>
-      
+
+      <!-- 4. LEVELS -->
       <section id="screen-levels" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex items-center justify-between"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-xl font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 id="levels-world-title" class="text-lg font-black text-amber-400 font-messiri">المراحل</h2><span></span></div>
+        <div class="flex items-center justify-between"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-xs text-gray-300 hover:text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 id="levels-world-title" class="text-lg font-black text-amber-400 font-messiri">المراحل</h2><span class="w-8"></span></div>
         <div id="levels-grid" class="grid grid-cols-4 gap-3"></div>
       </section>
 
-      <!-- GAME -->
+      <!-- 5. GAME PLAY -->
       <section id="screen-game" class="hidden p-4 flex flex-col h-full justify-between pb-20">
         <div class="flex justify-between items-center glass-card p-3 rounded-2xl border border-white/10">
-          <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/40 p-2 rounded-xl border border-white/10 w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button><span id="game-level-num" class="text-xs font-black text-brand-400">مرحلة 1</span></div>
+          <div class="flex items-center gap-2"><button onclick="goBack()" class="text-gray-300 hover:text-white bg-black/40 p-2 rounded-xl border border-white/10 flex items-center justify-center w-8 h-8"><i class="fa-solid fa-arrow-right"></i></button><span id="game-level-num" class="text-xs font-black text-brand-400">مرحلة 1</span></div>
           <span class="text-xs text-amber-400 font-bold font-messiri">تحدي الألغاز ✨</span>
         </div>
         <div id="game-question-card" class="glass-card p-5 rounded-3xl border border-brand-500/30 text-center my-2 relative overflow-hidden flex flex-col items-center justify-center min-h-[140px]">
+          <span id="game-world-bg-icon" class="absolute -bottom-6 -right-6 text-7xl opacity-10">🧩</span>
           <h3 id="game-question-text" class="text-base font-black text-white font-messiri leading-relaxed">جاري التحميل...</h3>
+        </div>
+        <div class="glass-card p-3 rounded-2xl border border-amber-500/30 my-1">
+          <div class="text-[11px] font-black text-amber-400 mb-2 flex items-center gap-1.5 justify-center"><span>🛠️ وسائل المساعدة:</span></div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="useHintReveal()" class="bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">💡 كشف حرف</span><span class="text-[10px] text-amber-400 font-bold">15 🧩</span></button>
+            <button onclick="useHintRemoveWrong()" class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">🗑️ حذف خاطئ</span><span class="text-[10px] text-red-400 font-bold">10 🧩</span></button>
+            <button onclick="useHintSkip()" class="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">⏭️ تخطي</span><span class="text-[10px] text-purple-300 font-bold">30 🧩</span></button>
+          </div>
         </div>
         <div class="my-2"><div id="answer-slots-container" class="flex flex-wrap justify-center gap-2 max-w-xs mx-auto dir-rtl"></div></div>
         <div class="space-y-3 mt-auto">
           <div class="flex justify-center gap-4 text-xs font-bold text-gray-300">
-            <button onclick="shuffleLetters()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5"><i class="fa-solid fa-shuffle text-brand-400"></i> خلط الحروف</button>
-            <button onclick="removeLastLetter()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5"><i class="fa-solid fa-backspace text-red-400"></i> مسح حرف</button>
+            <button onclick="shuffleLetters()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:text-white"><i class="fa-solid fa-shuffle text-brand-400"></i> خلط الحروف</button>
+            <button onclick="removeLastLetter()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:text-white"><i class="fa-solid fa-backspace text-red-400"></i> مسح حرف</button>
           </div>
           <div id="letters-pool-container" class="grid grid-cols-7 gap-1.5 max-w-xs mx-auto dir-rtl"></div>
         </div>
       </section>
 
+      <!-- 6. EVENTS -->
       <section id="screen-events" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button></div>
-        <div class="glass-card p-5 rounded-2xl text-center border border-white/10"><span class="text-4xl mb-2 block">⏳</span><h3 class="text-lg font-black text-brand-400 font-messiri">قريباً جداً...</h3></div>
+        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">⚔️ الأحداث</h2></div>
+        <div class="glass-card p-5 rounded-2xl text-center border border-white/10"><span class="text-4xl mb-2 block">⏳</span><h3 class="text-lg font-black text-brand-400 font-messiri">قريباً جداً...</h3><p class="text-xs text-gray-400 mt-2">تحديات يومية ومواسم قادمة!</p></div>
       </section>
 
-      <!-- SHOP -->
+      <!-- 7. SHOP -->
       <section id="screen-shop" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">💎 المتجر</h2></div>
+        <div class="flex justify-between items-center"><div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">💎 المتجر</h2></div></div>
         <div id="shop-items-grid" class="grid grid-cols-2 gap-3"></div>
       </section>
 
-      <!-- LEADERBOARD -->
+      <!-- 8. LEADERBOARD -->
       <section id="screen-leaderboard" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">🏆 الصدارة</h2></div>
+        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">🏆 الصدارة</h2></div>
         <div id="leaderboard-top-3" class="grid grid-cols-3 gap-2 items-end pt-4 pb-2"></div>
         <div id="leaderboard-list" class="space-y-2"></div>
       </section>
 
-      <!-- PROFILE -->
+      <!-- 9. PROFILE -->
       <section id="screen-profile" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-amber-400 font-bold">الملف الشخصي</span></div>
-        <div class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center">
-          <img id="profile-avatar-img" src="" class="w-20 h-20 rounded-full border-4 border-brand-500 bg-game-darkBg object-cover mb-3" />
-          <div class="flex items-center gap-2"><h3 id="profile-name-text" class="text-lg font-black text-white font-messiri">اللاعب</h3><button onclick="editProfileName()" class="text-xs text-amber-400 bg-black/40 p-1.5 rounded-lg border border-white/10"><i class="fa-solid fa-pen"></i></button></div>
-          <span id="profile-title-badge" class="text-xs bg-brand-600/30 text-brand-300 border border-brand-500/40 px-3 py-0.5 rounded-full font-black mt-1">مستكشف</span>
+        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-amber-400 font-bold">الملف الشخصي</span></div>
+        <div class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
+          <div class="relative mb-3"><img id="profile-avatar-img" src="" class="w-20 h-20 rounded-full border-4 border-brand-500 bg-game-darkBg object-cover" /></div>
+          <div class="flex items-center gap-2"><h3 id="profile-name-text" class="text-lg font-black text-white font-messiri">اللاعب</h3><button onclick="editProfileName()" title="تغيير الاسم" class="text-xs text-amber-400 hover:text-amber-300 bg-black/40 p-1.5 rounded-lg border border-white/10"><i class="fa-solid fa-pen"></i></button></div>
+          <span id="profile-title-badge" class="text-xs bg-brand-600/30 text-brand-300 border border-brand-500/40 px-3 py-0.5 rounded-full font-black mt-1">مستكشف الألغاز</span>
         </div>
+        
         <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
-          <h4 class="text-xs font-black text-amber-300 font-messiri flex items-center gap-1.5"><span>👑</span> تجهيز الألقاب</h4>
-          <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">اللقب:</span><select id="equip-title-select" onchange="changeEquippedTitle(this.value)" class="bg-game-card text-yellow-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none"></select></div>
+          <h4 class="text-xs font-black text-amber-300 font-messiri flex items-center gap-1.5"><span>🎒</span> تجهيز العناصر</h4>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">اللقب المجهز:</span><select id="equip-title-select" onchange="changeEquippedTitle(this.value)" class="bg-game-card text-yellow-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الصورة الرمزية:</span><select id="equip-avatar-select" onchange="changeEquippedAvatar(this.value)" class="bg-game-card text-cyan-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none"></select></div>
+          </div>
         </div>
+
         <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">مرحلة</span><span id="profile-stat-level" class="text-base font-black text-brand-400">1</span></div>
-          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">دخول كـ</span><span id="profile-email-text" class="text-[10px] font-black text-purple-300 truncate w-full block">زائر</span></div>
-          <div class="glass-card p-3 rounded-2xl border border-amber-500/30"><span class="text-[10px] text-amber-400 font-bold block">ترتيبك 🏆</span><span id="profile-stat-rank" class="text-base font-black text-amber-400">-</span></div>
+          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">المرحلة</span><span id="profile-stat-level" class="text-base font-black text-brand-400">1</span></div>
+          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">ترتيبك 🏆</span><span id="profile-stat-rank" class="text-base font-black text-yellow-400">-</span></div>
+          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">دخول كـ</span><span id="profile-email-text" class="text-[9px] font-black text-purple-300 truncate w-full block">زائر</span></div>
         </div>
+
         <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
           <div id="auth-buttons-container" class="flex flex-col gap-2"></div>
-          <div id="owner-admin-btn-container" class="hidden pt-2 border-t border-white/10"><button onclick="navigateTo('admin')" class="w-full bg-red-600 text-white py-2.5 rounded-xl text-xs font-black flex justify-center gap-2"><span>👑 لوحة المالك</span></button></div>
+          <div id="owner-admin-btn-container" class="hidden pt-2 border-t border-white/10"><button onclick="navigateTo('admin')" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-lg"><span>👑 لوحة تحكم المالك العام</span></button></div>
         </div>
       </section>
 
-      <!-- PUBLIC PROFILE -->
+      <!-- 9B. PUBLIC PROFILE -->
       <section id="screen-public-profile" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button></div>
-        <div class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center">
+        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-cyan-400 font-bold">زيارة حساب</span></div>
+        <div id="pub-profile-card" class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
           <div class="relative mb-3"><img id="pub-avatar-img" src="" class="w-24 h-24 rounded-full border-4 border-cyan-500 bg-game-darkBg object-cover" /><span id="pub-owner-badge" class="hidden absolute -bottom-2 -right-2 text-xl drop-shadow-md">👑</span></div>
           <h3 id="pub-name-text" class="text-xl font-black text-white font-messiri">الاسم</h3>
           <span id="pub-title-badge" class="text-xs bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 px-3 py-0.5 rounded-full font-black mt-2">لقب</span>
         </div>
         <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">🏆</span><span class="text-[10px] text-gray-400 font-bold block">مرحلة</span><span id="pub-stat-level" class="text-xl font-black text-brand-400">1</span></div>
-          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">✨</span><span class="text-[10px] text-gray-400 font-bold block">نقاط</span><span id="pub-stat-score" class="text-xl font-black text-purple-300">0</span></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">🏆</span><span class="text-[10px] text-gray-400 font-bold block">المرحلة</span><span id="pub-stat-level" class="text-xl font-black text-brand-400">1</span></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">✨</span><span class="text-[10px] text-gray-400 font-bold block">مجموع النقاط</span><span id="pub-stat-score" class="text-xl font-black text-purple-300">0</span></div>
         </div>
         <div id="pub-admin-actions" class="hidden glass-card p-4 rounded-3xl border border-red-500/30 space-y-3 mt-4">
           <h4 class="text-xs font-black text-red-400 font-messiri flex items-center gap-1.5"><span>👑</span> إرسال هدايا</h4>
@@ -213,10 +249,12 @@
         </div>
       </section>
 
-      <!-- ADMIN PANEL -->
+      <!-- 10. ADMIN PANEL -->
       <section id="screen-admin" class="hidden p-4 space-y-4 pb-20">
-        <div class="flex justify-between items-center bg-red-950/60 border border-red-500/50 p-3.5 rounded-2xl"><button onclick="goBack()" class="bg-black/50 border border-white/20 text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-lg font-black text-yellow-300 font-messiri">👑 المالك</h2></div>
-        
+        <div class="flex justify-between items-center bg-red-950/60 border border-red-500/50 p-3.5 rounded-2xl shadow-lg">
+          <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/20 text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-lg font-black text-yellow-300 flex items-center gap-1.5 font-messiri"><span>👑</span> لوحة المالك</h2></div>
+        </div>
+
         <div class="flex flex-wrap gap-1 bg-game-card p-1 rounded-2xl border border-white/10 text-[11px] font-bold text-center">
           <button onclick="switchAdminTab('levels')" id="admintab-levels" class="flex-1 py-2 px-1 rounded-xl bg-brand-500 text-white font-black">المراحل</button>
           <button onclick="switchAdminTab('store')" id="admintab-store" class="flex-1 py-2 px-1 rounded-xl text-gray-400">المتجر</button>
@@ -225,79 +263,149 @@
           <button onclick="switchAdminTab('danger')" id="admintab-danger" class="flex-1 py-2 px-1 rounded-xl text-red-400">إدارة</button>
         </div>
 
+        <!-- Levels / Worlds Tab -->
         <div id="admin-sec-levels" class="space-y-3">
-          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3"><h3 class="text-xs font-black text-cyan-300">عالم جديد</h3><div class="grid grid-cols-2 gap-2"><input type="text" id="adm-world-id" placeholder="معرف (earth)" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="text" id="adm-world-name" placeholder="الاسم" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div><div class="grid grid-cols-3 gap-2"><input type="text" id="adm-world-icon" placeholder="أيقونة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white text-center" /><input type="number" id="adm-world-start" placeholder="من" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-world-end" placeholder="إلى" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div><button onclick="adminSaveWorld()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ العالم</button></div>
-          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3"><h3 class="text-xs font-black text-amber-300">مرحلة جديدة</h3><div class="grid grid-cols-2 gap-2"><input type="number" id="adm-lvl-num" placeholder="رقم" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><select id="adm-lvl-world" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select></div><input type="text" id="adm-lvl-question" placeholder="السؤال" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><div class="grid grid-cols-2 gap-2"><input type="text" id="adm-lvl-answer" placeholder="الإجابة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-lvl-shards" placeholder="جائزة" value="20" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div><button onclick="adminSaveLevel()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ المرحلة</button></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-cyan-300">إضافة عالم جديد</h3>
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-world-id" placeholder="المعرف (مثال: moon)" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="text" id="adm-world-name" placeholder="اسم العالم" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div>
+            <div class="grid grid-cols-3 gap-2"><input type="text" id="adm-world-icon" placeholder="أيقونة 🌍" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white text-center" /><input type="number" id="adm-world-start" placeholder="من مرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-world-end" placeholder="إلى مرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div>
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-world-reward-title" placeholder="لقب إنهاء العالم (اختياري)" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-amber-300" /><input type="text" id="adm-world-top10-reward" placeholder="جائزة أول 10 (لقب نادر)" class="bg-black/60 border border-yellow-500/40 rounded-xl p-2 text-xs text-yellow-400" /></div>
+            <button onclick="adminSaveWorld()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ العالم 🌍</button>
+          </div>
+
+          <div class="glass-card p-4 rounded-2xl border border-green-500/30 space-y-3">
+            <h3 class="text-xs font-black text-green-400">توليد مراحل سريعة</h3>
+            <p class="text-[10px] text-gray-300">يولد 100 مرحلة تلقائياً للعالم المحدد بأسئلة مؤقتة لتعديلها لاحقاً.</p>
+            <div class="flex gap-2">
+              <select id="adm-auto-lvl-world" class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select>
+              <button onclick="adminAutoGenerateLevels()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">توليد 100 ⚡</button>
+            </div>
+          </div>
+
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-amber-300">إضافة/تعديل مرحلة</h3>
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-lvl-num" placeholder="رقم المرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><select id="adm-lvl-world" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select></div>
+            <input type="text" id="adm-lvl-question" placeholder="السؤال" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-lvl-answer" placeholder="الإجابة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-lvl-shards" placeholder="الجائزة 🧩" value="20" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <button onclick="adminSaveLevel()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ المرحلة ➕</button>
+          </div>
         </div>
 
+        <!-- Store Tab -->
         <div id="admin-sec-store" class="hidden space-y-3">
-          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3"><h3 class="text-xs font-black text-purple-300">إضافة للمتجر (ألقاب)</h3><input type="text" id="adm-shop-title" placeholder="اسم اللقب" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><div class="grid grid-cols-2 gap-2"><input type="number" id="adm-shop-price-gems" placeholder="السعر بالجواهر" value="100" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-shop-price-shards" placeholder="أو بالشظايا" value="500" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div><button onclick="adminSaveShopItem()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black">إضافة للمتجر</button></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-purple-300">إضافة عنصر للمتجر</h3>
+            <select id="adm-shop-type" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white mb-2">
+               <option value="title">لقب (Title)</option>
+               <option value="avatar">صورة رمزية برابط (Avatar)</option>
+            </select>
+            <input type="text" id="adm-shop-title" placeholder="الاسم (أو رابط الصورة إذا اخترت Avatar)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-shop-price-gems" placeholder="السعر بالجواهر" value="100" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-shop-price-shards" placeholder="أو بالشظايا" value="500" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <button onclick="adminSaveShopItem()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black">إضافة للمتجر</button>
+          </div>
         </div>
 
+        <!-- Search Tab -->
         <div id="admin-sec-search" class="hidden space-y-3">
-          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3"><h3 class="text-xs font-black text-cyan-300">بحث عن لاعبين</h3><div class="flex gap-2"><input type="text" id="adm-search-input" placeholder="اسم اللاعب..." class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><button onclick="adminSearchUsers()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">بحث</button></div><div id="adm-search-results" class="space-y-2 max-h-60 overflow-y-auto"></div></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-cyan-300">بحث عن لاعبين</h3>
+            <div class="flex gap-2"><input type="text" id="adm-search-input" placeholder="اسم اللاعب..." class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><button onclick="adminSearchUsers()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">بحث</button></div>
+            <div id="adm-search-results" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
         </div>
 
+        <!-- Gifts Tab -->
         <div id="admin-sec-gift" class="hidden space-y-3">
-          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3"><h3 class="text-xs font-black text-yellow-300">كود ترويجي / هدايا</h3><input type="text" id="adm-code-name" placeholder="الرمز (FREE100)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white uppercase" /><div class="grid grid-cols-2 gap-2"><input type="number" id="adm-code-gems" placeholder="جواهر" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-code-shards" placeholder="شظايا" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div><input type="text" id="adm-code-item" placeholder="اسم لقب للهدية (اختياري)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><button onclick="adminCreateCode()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black">إنشاء الكود</button></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-yellow-300">كود ترويجي / هدايا</h3>
+            <input type="text" id="adm-code-name" placeholder="الرمز (FREE100)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white uppercase" />
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-code-gems" placeholder="جواهر" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-code-shards" placeholder="شظايا" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <input type="text" id="adm-code-item" placeholder="اسم لقب كهدية إضافية (اختياري)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
+            <button onclick="adminCreateCode()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black">إنشاء الكود</button>
+          </div>
+          <!-- قائمة الأكواد الحالية -->
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-brand-300">إدارة الأكواد الحالية</h3>
+            <div id="adm-codes-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+          </div>
         </div>
 
+        <!-- Danger Tab -->
         <div id="admin-sec-danger" class="hidden space-y-3">
-          <div class="glass-card p-4 rounded-2xl border border-red-500/30 space-y-3"><h3 class="text-xs font-black text-red-400">تصفير اللعبة</h3><p class="text-[10px] text-gray-400">إرجاع جميع اللاعبين للمرحلة 1 وتصفير نقاطهم.</p><button onclick="adminResetLeaderboard()" class="w-full btn-3d-red py-2.5 rounded-xl text-xs font-black">تصفير الجميع ⚠️</button></div>
+          <div class="glass-card p-4 rounded-2xl border border-red-500/30 space-y-3">
+            <h3 class="text-xs font-black text-red-400">تصفير الصدارة</h3>
+            <p class="text-[10px] text-gray-400">إرجاع جميع اللاعبين للمرحلة 1 وتصفير نقاطهم (لن يؤثر على حساب المالك).</p>
+            <button onclick="adminResetLeaderboard()" class="w-full btn-3d-red py-2.5 rounded-xl text-xs font-black">تصفير الجميع ⚠️</button>
+          </div>
         </div>
       </section>
     </main>
 
-    <!-- AUTH MODAL (Google, Email, Anonymous) -->
+    <!-- AUTH MODAL -->
     <div id="modal-auth" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="glass-card w-full max-w-xs p-5 rounded-3xl border border-white/20 space-y-3 relative">
-        <button onclick="closeModal('modal-auth')" class="absolute top-3 left-3 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-        <h3 class="text-base font-black text-white text-center font-messiri">دخول / إنشاء حساب</h3>
-        <button onclick="handleGoogleLogin()" class="w-full bg-white text-gray-900 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 hover:bg-gray-200 transition"><i class="fa-brands fa-google text-red-500"></i> الدخول بجوجل</button>
-        <div class="relative flex items-center justify-center my-1"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full">أو بالبريد</span></div>
+        <button onclick="closeModal('modal-auth')" class="absolute top-3 left-3 text-gray-400 text-xs"><i class="fa-solid fa-xmark text-base"></i></button>
+        <h3 class="text-base font-black text-white text-center font-messiri">تسجيل الدخول</h3>
+        
+        <button onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-gray-200 text-gray-900 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-lg"><i class="fa-brands fa-google text-red-500"></i> الدخول باستخدام Google</button>
+        <div class="relative flex items-center justify-center my-2"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full z-10">أو بالبريد</span><div class="absolute w-full h-px bg-white/10"></div></div>
+        
         <input type="email" id="auth-email-input" placeholder="البريد الإلكتروني" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-white" />
         <input type="password" id="auth-pass-input" placeholder="كلمة المرور" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-white" />
-        <button onclick="handleEmailLogin()" class="w-full btn-3d-orange py-2.5 rounded-xl text-xs font-black">تسجيل / إنشاء</button>
-        <div class="relative flex items-center justify-center my-1"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full">أو كزائر</span></div>
-        <button onclick="handleAnonymousLogin()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2"><i class="fa-solid fa-user-secret"></i> دخول كزائر</button>
+        <button onclick="handleEmailLogin()" class="w-full btn-3d-orange py-2.5 rounded-xl text-xs font-black">دخول / إنشاء حساب</button>
+        
+        <div class="relative flex items-center justify-center my-2"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full z-10">أو كزائر</span><div class="absolute w-full h-px bg-white/10"></div></div>
+        <button onclick="handleAnonymousLogin()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user-secret"></i> الدخول كزائر</button>
       </div>
     </div>
 
     <!-- PROMO REDEEM MODAL -->
     <div id="modal-redeem" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="glass-card w-full max-w-xs p-5 rounded-3xl border border-brand-500/40 text-center space-y-3 relative">
-        <button onclick="closeModal('modal-redeem')" class="absolute top-3 left-3 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeModal('modal-redeem')" class="absolute top-3 left-3 text-gray-400 text-xs"><i class="fa-solid fa-xmark text-base"></i></button>
         <span class="text-3xl">🎁</span><h3 class="text-base font-black text-white font-messiri">استبدال كود</h3>
-        <input type="text" id="redeem-code-input" placeholder="الكود" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-center text-yellow-300 font-black uppercase" />
+        <input type="text" id="redeem-code-input" placeholder="أدخل الكود" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-center text-yellow-300 font-black uppercase" />
         <button onclick="claimPromoCode()" class="w-full btn-3d-orange py-2.5 rounded-xl text-xs font-black">استلام</button>
       </div>
     </div>
 
     <!-- WIN MODAL -->
     <div id="modal-win" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="glass-card-orange w-full max-w-xs p-6 rounded-3xl border border-amber-400 text-center space-y-4 scale-105"><span class="text-5xl animate-bounce inline-block">🎉</span><h3 class="text-2xl font-black text-amber-300 font-messiri">إجابة صحيحة!</h3><p id="win-reward-text" class="text-xs text-white font-bold"></p><button onclick="nextLevelFromWinModal()" class="w-full btn-3d-orange py-3 rounded-2xl text-sm font-black">المرحلة التالية ➔</button></div>
+      <div class="glass-card-orange w-full max-w-xs p-6 rounded-3xl border border-amber-400 text-center space-y-4 scale-105 shadow-glow-orange"><span class="text-5xl animate-bounce inline-block">🎉</span><h3 class="text-2xl font-black text-amber-300 font-messiri">إجابة صحيحة!</h3><p id="win-reward-text" class="text-xs text-white font-bold"></p><button onclick="nextLevelFromWinModal()" class="w-full btn-3d-orange py-3 rounded-2xl text-sm font-black">المرحلة التالية ➔</button></div>
     </div>
 
     <!-- WORLD COMPLETE MODAL -->
     <div id="modal-world-complete" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="glass-card w-full max-w-sm p-8 rounded-3xl border-2 border-yellow-400 text-center space-y-5 scale-105 shadow-[0_0_30px_rgba(250,204,21,0.5)]"><span class="text-6xl animate-pulse block">🏆</span><h3 class="text-3xl font-black text-yellow-400 font-messiri">تهانينا يا أسطورة!</h3><p class="text-sm text-gray-200 font-bold">أنهيت هذا العالم بنجاح.</p><div class="bg-black/40 border border-yellow-500/30 p-3 rounded-xl"><p class="text-xs text-yellow-300 font-black">مكافأة العالم:</p><p class="text-lg font-black text-white mt-1">+100 💎  |  +500 🧩</p></div><button onclick="closeWorldCompleteAndGoNext()" class="w-full btn-3d-purple py-3 rounded-2xl text-sm font-black">انتقل للعالم التالي 🚀</button></div>
+      <div class="glass-card w-full max-w-sm p-8 rounded-3xl border-2 border-yellow-400 text-center space-y-4 scale-105 shadow-[0_0_30px_rgba(250,204,21,0.5)]">
+         <span class="text-6xl animate-pulse block">🏆</span>
+         <h3 class="text-3xl font-black text-yellow-400 font-messiri">تهانينا يا أسطورة!</h3>
+         <p class="text-sm text-gray-200 font-bold">أنهيت هذا العالم ببراعة.</p>
+         <div class="bg-black/40 border border-yellow-500/30 p-3 rounded-xl space-y-2">
+            <p class="text-xs text-yellow-300 font-black">مكافآت إتمام العالم:</p>
+            <p class="text-lg font-black text-white">+100 💎 | +500 🧩</p>
+            <p id="world-complete-title-reward" class="text-xs font-bold text-cyan-300"></p>
+         </div>
+         <p id="world-complete-top10" class="text-sm font-black text-amber-400 animate-pulse"></p>
+         <button onclick="closeWorldCompleteAndGoNext()" class="w-full btn-3d-purple py-3 rounded-2xl text-sm font-black mt-2">انتقل للعالم التالي 🚀</button>
+      </div>
     </div>
 
     <!-- BOTTOM NAV -->
     <nav id="bottom-nav" class="hidden relative z-40 bg-gray-950/90 backdrop-blur-md border-t border-white/10 px-2 py-2 flex justify-around items-center shrink-0">
-      <button onclick="navigateTo('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-brand-500 text-[11px]"><i class="fa-solid fa-house text-base"></i><span>الرئيسية</span></button>
-      <button onclick="navigateTo('worlds')" id="nav-worlds" class="flex flex-col items-center gap-0.5 text-gray-400 text-[11px]"><i class="fa-solid fa-map-location-dot text-base"></i><span>العوالم</span></button>
-      <button onclick="navigateTo('shop')" id="nav-shop" class="flex flex-col items-center gap-0.5 text-gray-400 text-[11px]"><i class="fa-solid fa-store text-base"></i><span>المتجر</span></button>
-      <button onclick="navigateTo('profile')" id="nav-profile" class="flex flex-col items-center gap-0.5 text-gray-400 text-[11px]"><i class="fa-solid fa-user text-base"></i><span>حسابي</span></button>
+      <button onclick="navigateTo('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-brand-500 font-black text-[11px]"><i class="fa-solid fa-house text-base"></i><span>الرئيسية</span></button>
+      <button onclick="navigateTo('worlds')" id="nav-worlds" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-map-location-dot text-base"></i><span>العوالم</span></button>
+      <button onclick="navigateTo('shop')" id="nav-shop" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-store text-base"></i><span>المتجر</span></button>
+      <button onclick="navigateTo('profile')" id="nav-profile" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-user text-base"></i><span>حسابي</span></button>
     </nav>
   </div>
 
+  <!-- FIREBASE IMPORTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    /* User Config */
+    // Firebase Config provided by User (Untouched)
     const firebaseConfig = {
       apiKey: "AIzaSyD0FHhDSALwdi4isWZ5KJLR8yZNbx9ZKD4",
       authDomain: "lghzak-game-2caa2.firebaseapp.com",
@@ -312,47 +420,33 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    /* Attach to window object to be used by regular scripts */
-    window.firebaseApp = app;
-    window.firebaseAuth = auth;
-    window.firebaseDb = db;
-    window.signInAnonymously = signInAnonymously;
-    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-    window.signOut = signOut;
-    window.GoogleAuthProvider = GoogleAuthProvider;
-    window.signInWithPopup = signInWithPopup;
-    window.doc = doc;
-    window.setDoc = setDoc;
-    window.getDoc = getDoc;
-    window.updateDoc = updateDoc;
-    window.collection = collection;
-    window.getDocs = getDocs;
-    window.onSnapshot = onSnapshot;
+    window.firebaseApp = app; window.firebaseAuth = auth; window.firebaseDb = db;
+    window.signInAnonymously = signInAnonymously; window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; window.signOut = signOut;
+    window.GoogleAuthProvider = GoogleAuthProvider; window.signInWithPopup = signInWithPopup;
+    window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc; window.updateDoc = updateDoc; window.collection = collection; window.getDocs = getDocs; window.onSnapshot = onSnapshot;
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'lghzak_v3';
     window.DB_PATH = `artifacts/${appId}/public/data/`;
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        window.currentUserId = user.uid;
-        await window.loadPlayerData(user);
-        window.setupRealtimeListeners();
-      } else {
-        window.currentUserId = null;
-        window.resetPlayerData();
-      }
+      if (user) { window.currentUserId = user.uid; await window.loadPlayerData(user); window.setupRealtimeListeners(); } 
+      else { window.currentUserId = null; window.resetPlayerData(); }
       window.updateUIForAuth();
     });
   </script>
   
+  <!-- GAME LOGIC -->
   <script>
     const OWNER_EMAIL = "mohammedabudayya2011@gmail.com";
-    let screenHistory = ['home'], allUsers = [], dbWorlds = [], dbLevels = [], dbCodes = [], dbShopItems = [];
+    let screenHistory = ['home'], allUsers = [], dbWorlds = [], dbLevels = [], dbShopItems = [], dbCodes = [];
     
+    // Player State includes avatars now
     let defaultPlayer = {
-      uid: '', email: '', name: 'زائر', avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${Math.random()}`,
-      currentLevel: 1, shards: 0, gems: 0, titles: ['مستكشف الألغاز'], equippedTitle: 'مستكشف الألغاز', isOwner: false
+      uid: '', email: '', name: 'زائر', avatar: '',
+      currentLevel: 1, shards: 0, gems: 0,
+      titles: ['مستكشف الألغاز'], equippedTitle: 'مستكشف الألغاز',
+      avatars: ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'], equippedAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak',
+      isOwner: false
     };
     let player = JSON.parse(JSON.stringify(defaultPlayer));
     let currentLevelObj = null, currentSlots = [], availableLetters = [];
@@ -361,6 +455,7 @@
     function getDisplayGems() { return isOwner() ? "∞" : player.gems; }
     function getDisplayShards() { return isOwner() ? "∞" : player.shards; }
 
+    // Navigation & UI
     function navigateTo(screenId) {
       document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
       document.getElementById(`screen-${screenId}`).classList.remove('hidden');
@@ -370,25 +465,20 @@
       if(screenId === 'leaderboard') renderLeaderboard();
       if(screenId === 'admin') populateAdminDropdowns();
       if(screenId === 'shop') renderShopItems();
-      if(screenId === 'profile') calculateProfileRank();
+      if(screenId === 'profile') { calculateProfileRank(); updateUI(); }
     }
     
     function goBack() {
-      if (screenHistory.length > 1) {
-        screenHistory.pop();
-        navigateTo(screenHistory.pop());
-      } else { navigateTo('home'); }
+      if (screenHistory.length > 1) { screenHistory.pop(); navigateTo(screenHistory.pop()); } 
+      else { navigateTo('home'); }
     }
 
     function updateNavStyles(activeScreen) {
       document.querySelectorAll('#bottom-nav button').forEach(btn => { btn.classList.remove('text-brand-500'); btn.classList.add('text-gray-400'); });
       const activeBtn = document.getElementById(`nav-${activeScreen}`);
       if (activeBtn) { activeBtn.classList.remove('text-gray-400'); activeBtn.classList.add('text-brand-500'); }
-      if (['splash', 'game', 'admin', 'public-profile'].includes(activeScreen)) {
-        document.getElementById('bottom-nav').classList.add('hidden'); document.getElementById('top-bar').classList.add('hidden');
-      } else {
-        document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById('top-bar').classList.remove('hidden');
-      }
+      if (['splash', 'game', 'admin', 'public-profile'].includes(activeScreen)) { document.getElementById('bottom-nav').classList.add('hidden'); document.getElementById('top-bar').classList.add('hidden'); } 
+      else { document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById('top-bar').classList.remove('hidden'); }
     }
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -405,6 +495,7 @@
       setTimeout(() => { toast.classList.add('-translate-y-10', 'opacity-0'); }, 3000);
     }
 
+    // Audio SFX
     let audioCtx = null;
     function playSFX(type) {
       try {
@@ -412,38 +503,53 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
-        if (type === 'click') {
-          osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
-          gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        } else if (type === 'win') {
-          osc.type = 'triangle'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
-          gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-        }
+        if (type === 'click') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05); gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1); } 
+        else if (type === 'win') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5); }
       } catch (e) {}
     }
 
+    // Auth & Init
     window.onload = () => { setTimeout(() => { if(!window.currentUserId) navigateTo('home'); }, 1500); }
     window.resetPlayerData = () => { player = JSON.parse(JSON.stringify(defaultPlayer)); updateUI(); };
     window.loadPlayerData = async (user) => {
       try {
         const userRef = window.doc(window.firebaseDb, window.DB_PATH + 'users', user.uid);
         const snap = await window.getDoc(userRef);
-        if (snap.exists()) {
-          player = { ...defaultPlayer, ...snap.data(), uid: user.uid, email: user.email || '' }; player.isOwner = (user.email === OWNER_EMAIL);
+        if (snap.exists()) { 
+           player = { ...defaultPlayer, ...snap.data(), uid: user.uid, email: user.email || '' };
+           if(!player.avatars) player.avatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'];
+           if(!player.equippedAvatar) player.equippedAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
         } else {
-          player = { ...defaultPlayer, uid: user.uid, email: user.email || '', name: 'لاعب_' + Math.floor(Math.random()*9999), isOwner: (user.email === OWNER_EMAIL) };
-          await window.setDoc(userRef, player);
+           player = { ...defaultPlayer, uid: user.uid, email: user.email || '', name: 'لاعب_' + Math.floor(Math.random()*9999) };
+           await window.setDoc(userRef, player);
         }
+        player.isOwner = (user.email === OWNER_EMAIL);
+        
+        // Auto init 3 default worlds if db is completely empty
+        const wRef = window.collection(window.firebaseDb, window.DB_PATH + 'worlds');
+        const wDocs = await window.getDocs(wRef);
+        if(wDocs.empty) { await initializeDefaultWorlds(); }
+
         updateUI(); if(screenHistory[screenHistory.length-1] === 'splash') navigateTo('home');
       } catch (error) { showToast("خطأ في جلب البيانات", "❌", "error"); }
     };
 
+    async function initializeDefaultWorlds() {
+       try {
+         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'forest'), { id: 'forest', name: 'غابة البداية', icon: '🌲', start: 1, end: 100, rewardTitle: 'ملك الغابة', top10Reward: 'أسطورة البدايات', finishersCount: 0 });
+         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'desert'), { id: 'desert', name: 'صحراء الغموض', icon: '🏜️', start: 101, end: 200, rewardTitle: 'فارس الصحراء', top10Reward: 'عقرب الرمال', finishersCount: 0 });
+         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'ice'), { id: 'ice', name: 'جبل الجليد', icon: '🏔️', start: 201, end: 300, rewardTitle: 'قاهر الصقيع', top10Reward: 'التنين الثلجي', finishersCount: 0 });
+         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_1'), { num: 1, world: 'forest', q: 'ما هو الشيء الذي يحك رأسه وهو غير عاقل؟', a: 'قلم', shards: 20 });
+       } catch(e){}
+    }
+
     window.setupRealtimeListeners = () => {
       window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'worlds'), (snap) => {
         dbWorlds = snap.docs.map(d => d.data()).sort((a,b)=>a.start - b.start);
+        document.getElementById('home-worlds-count').innerText = `${dbWorlds.length} عوالم ساحرة`;
+        document.getElementById('worlds-total-badge').innerText = `${dbWorlds.length} عالم`;
         if(screenHistory[screenHistory.length-1] === 'worlds') renderWorldsGrid();
+        populateAdminDropdowns();
       });
       window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'levels'), (snap) => {
         dbLevels = snap.docs.map(d => d.data()).sort((a,b)=>a.num - b.num);
@@ -451,6 +557,10 @@
       window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'shop'), (snap) => {
         dbShopItems = snap.docs.map(d => d.data());
         if(screenHistory[screenHistory.length-1] === 'shop') renderShopItems();
+      });
+      window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'codes'), (snap) => {
+        dbCodes = snap.docs.map(d => d.data());
+        if(screenHistory[screenHistory.length-1] === 'admin') renderAdminCodes();
       });
       window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'users'), (snap) => {
         allUsers = snap.docs.map(d => d.data());
@@ -460,7 +570,9 @@
       if (player.uid) {
          window.onSnapshot(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), (docSnap) => {
             if(docSnap.exists()){
-               const data = docSnap.data(); player.shards = data.shards; player.gems = data.gems; player.currentLevel = data.currentLevel; player.name = data.name; player.titles = data.titles || ['مستكشف الألغاز']; player.equippedTitle = data.equippedTitle || 'مستكشف الألغاز';
+               const data = docSnap.data(); player.shards = data.shards; player.gems = data.gems; player.currentLevel = data.currentLevel; player.name = data.name; 
+               player.titles = data.titles || ['مستكشف الألغاز']; player.equippedTitle = data.equippedTitle || 'مستكشف الألغاز';
+               player.avatars = data.avatars || ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak']; player.equippedAvatar = data.equippedAvatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
                updateUI();
             }
          });
@@ -483,49 +595,42 @@
     };
 
     function updateUI() {
-      document.getElementById('currency-shards').innerText = getDisplayShards();
-      document.getElementById('currency-gems').innerText = getDisplayGems();
-      document.getElementById('header-name').innerText = player.name;
-      document.getElementById('header-title').innerText = player.equippedTitle;
-      document.getElementById('profile-name-text').innerText = player.name;
-      document.getElementById('profile-stat-level').innerText = player.currentLevel;
-      document.getElementById('profile-title-badge').innerText = player.equippedTitle;
-      document.getElementById('profile-avatar-img').src = player.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${player.name}`;
-      const titleSelect = document.getElementById('equip-title-select');
-      titleSelect.innerHTML = '';
+      document.getElementById('currency-shards').innerText = getDisplayShards(); document.getElementById('currency-gems').innerText = getDisplayGems();
+      document.getElementById('header-name').innerText = player.name; document.getElementById('header-title').innerText = player.equippedTitle;
+      document.getElementById('header-avatar').src = player.equippedAvatar;
+      document.getElementById('profile-name-text').innerText = player.name; document.getElementById('profile-stat-level').innerText = player.currentLevel;
+      document.getElementById('profile-title-badge').innerText = player.equippedTitle; document.getElementById('profile-avatar-img').src = player.equippedAvatar;
+      
+      const titleSelect = document.getElementById('equip-title-select'); titleSelect.innerHTML = '';
       player.titles.forEach(t => { titleSelect.innerHTML += `<option value="${t}" ${player.equippedTitle === t ? 'selected' : ''}>${t}</option>`; });
+      
+      const avatarSelect = document.getElementById('equip-avatar-select'); avatarSelect.innerHTML = '';
+      player.avatars.forEach((a, i) => { avatarSelect.innerHTML += `<option value="${a}" ${player.equippedAvatar === a ? 'selected' : ''}>صورة رمزية ${i+1}</option>`; });
     }
 
     async function savePlayer() {
       if(!player.uid) return;
-      try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatar: player.avatar }); } catch(e) {}
+      try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatars: player.avatars, equippedAvatar: player.equippedAvatar }); } catch(e) {}
     }
 
+    // Login logic
     async function handleEmailLogin() {
-      const email = document.getElementById('auth-email-input').value; const pass = document.getElementById('auth-pass-input').value;
-      if(!email || !pass) return showToast("الرجاء إدخال البيانات", "⚠️", "error");
-      try {
-        await window.signInWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("تم الدخول بنجاح", "✅", "success");
-      } catch (error) {
-         if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-             try { await window.createUserWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("تم إنشاء الحساب بنجاح", "✅", "success"); } catch(err) { showToast("خطأ في الإنشاء", "❌", "error"); }
-         } else { showToast("خطأ في البيانات", "❌", "error"); }
+      const email = document.getElementById('auth-email-input').value, pass = document.getElementById('auth-pass-input').value;
+      if(!email || !pass) return showToast("أدخل البيانات", "⚠️", "error");
+      try { await window.signInWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("مرحباً بك", "✅", "success"); } 
+      catch (e) {
+         if(e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+             try { await window.createUserWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("تم إنشاء الحساب", "✅", "success"); } catch(err) { showToast("خطأ", "❌", "error"); }
+         } else showToast("خطأ بالبيانات", "❌", "error");
       }
     }
-
     async function handleGoogleLogin() {
-       try {
-          const provider = new window.GoogleAuthProvider();
-          await window.signInWithPopup(window.firebaseAuth, provider);
-          closeModal('modal-auth'); showToast("تم الدخول باستخدام جوجل بنجاح", "✅", "success");
-       } catch(e) { showToast("فشل تسجيل الدخول بجوجل", "❌", "error"); }
+       try { const provider = new window.GoogleAuthProvider(); await window.signInWithPopup(window.firebaseAuth, provider); closeModal('modal-auth'); showToast("مرحباً بك", "✅", "success"); } catch(e) { showToast("فشل", "❌", "error"); }
     }
+    async function handleAnonymousLogin() { try { await window.signInAnonymously(window.firebaseAuth); closeModal('modal-auth'); showToast("دخلت كزائر", "✅", "success"); } catch(e) { showToast("خطأ", "❌", "error"); } }
+    async function handleLogout() { try { await window.signOut(window.firebaseAuth); showToast("وداعاً", "👋", "success"); } catch(e) {} }
 
-    async function handleAnonymousLogin() {
-       try { await window.signInAnonymously(window.firebaseAuth); closeModal('modal-auth'); showToast("تم الدخول كزائر", "✅", "success"); } catch(e) { showToast("حدث خطأ", "❌", "error"); }
-    }
-    async function handleLogout() { try { await window.signOut(window.firebaseAuth); showToast("تم تسجيل الخروج", "👋", "success"); } catch(e) {} }
-
+    // Game Core
     function playCurrentLevel() {
       const lvl = dbLevels.find(l => l.num == player.currentLevel);
       if(!lvl) return showToast("قريباً مراحل جديدة!", "🚀", "info");
@@ -559,6 +664,7 @@
 
     function loadLevel(lvl) {
       currentLevelObj = lvl; document.getElementById('game-level-num').innerText = `مرحلة ${lvl.num}`; document.getElementById('game-question-text').innerText = lvl.q;
+      const w = dbWorlds.find(x => x.id === lvl.world); if(w) document.getElementById('game-world-bg-icon').innerText = w.icon;
       currentSlots = Array(lvl.a.length).fill(null);
       const arabicLetters = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'; availableLetters = lvl.a.split('');
       while(availableLetters.length < 14) availableLetters.push(arabicLetters[Math.floor(Math.random() * arabicLetters.length)]);
@@ -591,31 +697,51 @@
       }
     }
 
+    // World Completion logic included here
     async function nextLevelFromWinModal() {
       closeModal('modal-win');
       if (player.currentLevel === currentLevelObj.num) {
          if(!isOwner()) player.shards += currentLevelObj.shards;
          player.currentLevel += 1; await savePlayer();
+         
          const currentWorld = dbWorlds.find(w => w.id === currentLevelObj.world);
          if(currentWorld && currentWorld.end == currentLevelObj.num) {
-            if(!isOwner()) { player.gems += 100; player.shards += 500; }
-            await savePlayer(); openModal('modal-world-complete'); return;
+            let gotTop10 = false;
+            if(!isOwner()) { 
+               player.gems += 100; player.shards += 500;
+               if(currentWorld.rewardTitle && !player.titles.includes(currentWorld.rewardTitle)) player.titles.push(currentWorld.rewardTitle);
+               
+               let finishers = currentWorld.finishersCount || 0;
+               if(finishers < 10) {
+                  gotTop10 = true;
+                  if(currentWorld.top10Reward && !player.titles.includes(currentWorld.top10Reward)) player.titles.push(currentWorld.top10Reward);
+                  await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', currentWorld.id), { finishersCount: finishers + 1 });
+               }
+            }
+            await savePlayer();
+            document.getElementById('world-complete-title-reward').innerText = currentWorld.rewardTitle ? `+ لقب: ${currentWorld.rewardTitle}` : '';
+            document.getElementById('world-complete-top10').innerText = gotTop10 ? `🎉 مبروك! أنت من أول 10 أساطير أنهوا العالم! جائزتك: ${currentWorld.top10Reward}` : '';
+            openModal('modal-world-complete'); return;
          }
       }
       playCurrentLevel();
     }
     function closeWorldCompleteAndGoNext() { closeModal('modal-world-complete'); playCurrentLevel(); }
 
+    // Shop
     function renderShopItems() {
        const grid = document.getElementById('shop-items-grid'); if(!grid) return; grid.innerHTML = '';
        if(!dbShopItems || dbShopItems.length === 0) return grid.innerHTML = '<div class="col-span-2 text-center text-gray-400 text-xs py-8">المتجر فارغ حالياً.</div>';
        dbShopItems.forEach(item => {
-          const owned = player.titles.includes(item.name);
+          let isOwned = false;
+          if(item.type === 'title') isOwned = player.titles.includes(item.name);
+          else if(item.type === 'avatar') isOwned = player.avatars.includes(item.name);
+
           grid.innerHTML += `
-             <div class="glass-card p-3 rounded-2xl border ${owned ? 'border-green-500/50' : 'border-white/10'} text-center flex flex-col items-center">
-                <span class="text-xs font-black text-brand-300 mb-2">لقب: ${item.name}</span>
-                ${owned ? `<span class="text-[10px] text-green-400 font-bold bg-green-500/20 px-2 py-1 rounded-full mb-2 w-full">مملوك</span>` : 
-                `<div class="flex gap-1 w-full mb-2">
+             <div class="glass-card p-3 rounded-2xl border ${isOwned ? 'border-green-500/50' : 'border-white/10'} text-center flex flex-col items-center">
+                ${item.type === 'avatar' ? `<img src="${item.name}" class="w-12 h-12 rounded-full mb-2 bg-black/50 border border-cyan-500"/>` : `<span class="text-xs font-black text-brand-300 mb-2">لقب: ${item.name}</span>`}
+                ${isOwned ? `<span class="text-[10px] text-green-400 font-bold bg-green-500/20 px-2 py-1 rounded-full mb-1 w-full">مملوك</span>` : 
+                `<div class="flex gap-1 w-full mb-1">
                    ${item.gems > 0 ? `<button onclick="buyShopItem('${item.id}', 'gems', ${item.gems})" class="flex-1 bg-purple-600/30 text-purple-300 text-[10px] font-bold py-1.5 rounded-lg border border-purple-500/40">${item.gems} 💎</button>` : ''}
                    ${item.shards > 0 ? `<button onclick="buyShopItem('${item.id}', 'shards', ${item.shards})" class="flex-1 bg-brand-600/30 text-brand-300 text-[10px] font-bold py-1.5 rounded-lg border border-brand-500/40">${item.shards} 🧩</button>` : ''}
                 </div>`}
@@ -627,53 +753,23 @@
     async function buyShopItem(id, currency, cost) {
        const item = dbShopItems.find(x => x.id === id); if(!item) return;
        if(player[currency] < cost) return showToast(`الرصيد غير كافِ`, "⚠️", "error");
-       player[currency] -= cost; player.titles.push(item.name); await savePlayer();
-       renderShopItems(); showToast(`تم شراء: ${item.name}`, "🎉", "success");
+       player[currency] -= cost; 
+       if(item.type === 'title') player.titles.push(item.name);
+       else if(item.type === 'avatar') player.avatars.push(item.name);
+       await savePlayer(); renderShopItems(); showToast(`تم الشراء بنجاح`, "🎉", "success");
     }
 
-    async function claimPromoCode() {
-       const codeInput = document.getElementById('redeem-code-input').value.trim().toUpperCase();
-       if(!codeInput) return showToast("أدخل الكود", "⚠️", "error");
-       if(!player.uid) return showToast("يجب تسجيل الدخول", "🔒", "error");
-       try {
-          const codeRef = window.doc(window.firebaseDb, window.DB_PATH + 'codes', codeInput);
-          const snap = await window.getDoc(codeRef);
-          if(!snap.exists() || !snap.data().active) return showToast("كود غير صالح", "❌", "error");
-          
-          const claimedRef = window.doc(window.firebaseDb, window.DB_PATH + `users/${player.uid}/claimedCodes`, codeInput);
-          const claimedSnap = await window.getDoc(claimedRef);
-          if(claimedSnap.exists()) return showToast("استخدمت الكود مسبقاً", "⚠️", "error");
-          
-          const data = snap.data(); let msg = "حصلت على: ";
-          if(data.gems > 0) { player.gems += data.gems; msg += `${data.gems}💎 `; }
-          if(data.shards > 0) { player.shards += data.shards; msg += `${data.shards}🧩 `; }
-          if(data.item && data.item !== '') {
-             if(!player.titles.includes(data.item)) { player.titles.push(data.item); msg += `لقب (${data.item}) `; }
-          }
-          await savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
-          closeModal('modal-redeem'); showToast(msg, "🎉", "success"); document.getElementById('redeem-code-input').value = '';
-       } catch(e) { showToast("خطأ", "❌", "error"); }
-    }
-
+    // Leaderboard & Rank
     function calculateProfileRank() {
         if(!player.uid) return;
-        const sorted = [...allUsers].sort((a,b) => {
-           if(b.currentLevel === a.currentLevel) return b.shards - a.shards;
-           return b.currentLevel - a.currentLevel;
-        });
+        const sorted = [...allUsers].sort((a,b) => { if(b.currentLevel === a.currentLevel) return b.shards - a.shards; return b.currentLevel - a.currentLevel; });
         const rankIndex = sorted.findIndex(u => u.uid === player.uid);
         const rankSpan = document.getElementById('profile-stat-rank');
-        if(rankIndex !== -1) {
-            rankSpan.innerText = rankIndex + 1;
-            rankSpan.classList.add(rankIndex < 3 ? 'text-yellow-400' : 'text-amber-400');
-        } else { rankSpan.innerText = '-'; }
+        if(rankIndex !== -1) { rankSpan.innerText = rankIndex + 1; rankSpan.classList.add(rankIndex < 3 ? 'text-yellow-400' : 'text-amber-400'); } else { rankSpan.innerText = '-'; }
     }
 
     function renderLeaderboard() {
-       const sorted = [...allUsers].sort((a,b) => {
-           if(b.currentLevel === a.currentLevel) return b.shards - a.shards;
-           return b.currentLevel - a.currentLevel;
-       }).slice(0, 50);
+       const sorted = [...allUsers].sort((a,b) => { if(b.currentLevel === a.currentLevel) return b.shards - a.shards; return b.currentLevel - a.currentLevel; }).slice(0, 50);
        const top3 = document.getElementById('leaderboard-top-3'); top3.innerHTML = '';
        if(sorted.length >= 2) top3.innerHTML += buildTopCard(sorted[1], '🥈', 'cyan');
        if(sorted.length >= 1) top3.innerHTML += buildTopCard(sorted[0], '👑', 'yellow', true);
@@ -681,18 +777,19 @@
 
        const list = document.getElementById('leaderboard-list'); list.innerHTML = '';
        sorted.slice(3).forEach((u, i) => {
-          list.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-white/5 cursor-pointer hover:bg-white/5"><div class="flex items-center gap-3"><span class="text-xs font-black text-gray-500 w-4">${i+4}</span><div class="relative"><img src="${u.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px]">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-black/50 text-gray-400 px-2 py-1 rounded-lg text-[10px] border border-white/10">زيارة</button></div>`;
+          list.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-white/5 cursor-pointer hover:bg-white/5"><div class="flex items-center gap-3"><span class="text-xs font-black text-gray-500 w-4">${i+4}</span><div class="relative"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px]">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-black/50 text-gray-400 px-2 py-1 rounded-lg text-[10px] border border-white/10 flex gap-1 items-center"><i class="fa-solid fa-eye"></i> زيارة</button></div>`;
        });
     }
 
     function buildTopCard(u, icon, color, isFirst=false) {
-       return `<div onclick="openPublicProfile('${u.uid}')" class="glass-card${isFirst?'-orange scale-105 shadow-glow-orange border-amber-400 border-2' : ` border border-${color}-500/30`} p-3 rounded-2xl text-center flex flex-col items-center cursor-pointer"><span class="text-${isFirst?'2xl':'lg'} mb-1">${icon}</span><div class="relative mb-1"><img src="${u.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-${isFirst?'12':'10'} h-${isFirst?'12':'10'} rounded-full border border-${color}-400" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-xs">👑</span>` : ''}</div><span class="text-[11px] font-black text-${isFirst?'yellow-300':'white'} truncate w-full">${u.name}</span><span class="text-[10px] text-${color}-400 font-bold">مرحلة ${u.currentLevel}</span></div>`;
+       return `<div onclick="openPublicProfile('${u.uid}')" class="glass-card${isFirst?'-orange scale-105 shadow-glow-orange border-amber-400 border-2' : ` border border-${color}-500/30`} p-3 rounded-2xl text-center flex flex-col items-center cursor-pointer"><span class="text-${isFirst?'2xl':'lg'} mb-1">${icon}</span><div class="relative mb-1"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-${isFirst?'12':'10'} h-${isFirst?'12':'10'} rounded-full border border-${color}-400" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-xs">👑</span>` : ''}</div><span class="text-[11px] font-black text-${isFirst?'yellow-300':'white'} truncate w-full">${u.name}</span><span class="text-[10px] text-${color}-400 font-bold">مرحلة ${u.currentLevel}</span></div>`;
     }
 
+    // Public Profile
     let viewedUser = null;
     function openPublicProfile(uid) {
        viewedUser = allUsers.find(u => u.uid === uid); if(!viewedUser) return;
-       document.getElementById('pub-avatar-img').src = viewedUser.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${viewedUser.name}`;
+       document.getElementById('pub-avatar-img').src = viewedUser.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${viewedUser.name}`;
        document.getElementById('pub-name-text').innerText = viewedUser.name;
        document.getElementById('pub-title-badge').innerText = viewedUser.equippedTitle || 'مستكشف الألغاز';
        document.getElementById('pub-stat-level').innerText = viewedUser.currentLevel;
@@ -702,26 +799,70 @@
        navigateTo('public-profile');
     }
 
+    // Profile Settings
     async function changeEquippedTitle(title) { player.equippedTitle = title; await savePlayer(); updateUI(); showToast("تم تغيير اللقب", "✅", "success"); }
-    async function editProfileName() { const newName = prompt("أدخل اسمك:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await savePlayer(); updateUI(); showToast("تم التحديث", "✅", "success"); } }
+    async function changeEquippedAvatar(avatarUrl) { player.equippedAvatar = avatarUrl; await savePlayer(); updateUI(); showToast("تم تغيير الصورة", "✅", "success"); }
+    async function editProfileName() { const newName = prompt("أدخل اسمك الجديد:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await savePlayer(); updateUI(); showToast("تم التحديث", "✅", "success"); } }
+    
+    // Promo Codes
+    async function claimPromoCode() {
+       const codeInput = document.getElementById('redeem-code-input').value.trim().toUpperCase();
+       if(!codeInput) return showToast("أدخل الكود", "⚠️", "error"); if(!player.uid) return showToast("يجب تسجيل الدخول", "🔒", "error");
+       try {
+          const codeRef = window.doc(window.firebaseDb, window.DB_PATH + 'codes', codeInput); const snap = await window.getDoc(codeRef);
+          if(!snap.exists() || !snap.data().active) return showToast("كود غير صالح", "❌", "error");
+          const claimedRef = window.doc(window.firebaseDb, window.DB_PATH + `users/${player.uid}/claimedCodes`, codeInput);
+          if((await window.getDoc(claimedRef)).exists()) return showToast("استخدمت الكود مسبقاً", "⚠️", "error");
+          
+          const data = snap.data(); let msg = "حصلت على: ";
+          if(data.gems > 0) { player.gems += data.gems; msg += `${data.gems}💎 `; }
+          if(data.shards > 0) { player.shards += data.shards; msg += `${data.shards}🧩 `; }
+          if(data.item && data.item !== '') { if(!player.titles.includes(data.item)) { player.titles.push(data.item); msg += `لقب (${data.item}) `; } }
+          
+          await savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
+          closeModal('modal-redeem'); showToast(msg, "🎉", "success"); document.getElementById('redeem-code-input').value = '';
+       } catch(e) { showToast("خطأ", "❌", "error"); }
+    }
 
+    // Admin Functions
     function switchAdminTab(tab) {
        document.querySelectorAll('[id^="admin-sec-"]').forEach(el => el.classList.add('hidden'));
        document.querySelectorAll('[id^="admintab-"]').forEach(el => el.className = el.id.includes('danger') ? "flex-1 py-2 px-1 rounded-xl text-red-400" : "flex-1 py-2 px-1 rounded-xl text-gray-400");
        document.getElementById(`admin-sec-${tab}`).classList.remove('hidden');
        const btn = document.getElementById(`admintab-${tab}`);
        if(tab === 'danger') btn.className = "flex-1 py-2 px-1 rounded-xl bg-red-600 text-white font-black"; else btn.className = "flex-1 py-2 px-1 rounded-xl bg-brand-500 text-white font-black";
+       if(tab === 'gift') renderAdminCodes();
     }
 
     function populateAdminDropdowns() {
        const sel = document.getElementById('adm-lvl-world'); sel.innerHTML = '';
-       dbWorlds.forEach(w => sel.innerHTML += `<option value="${w.id}">${w.name} ${w.icon}</option>`);
+       const autoSel = document.getElementById('adm-auto-lvl-world'); autoSel.innerHTML = '';
+       dbWorlds.forEach(w => { 
+          sel.innerHTML += `<option value="${w.id}">${w.name} ${w.icon}</option>`; 
+          autoSel.innerHTML += `<option value="${w.id}">${w.name}</option>`; 
+       });
     }
 
     async function adminSaveWorld() {
        const id = document.getElementById('adm-world-id').value.trim(), name = document.getElementById('adm-world-name').value.trim(), icon = document.getElementById('adm-world-icon').value.trim(), start = parseInt(document.getElementById('adm-world-start').value), end = parseInt(document.getElementById('adm-world-end').value);
-       if(!id || !name || !icon || !start || !end) return showToast("أكمل البيانات", "⚠️", "error");
-       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', id), { id, name, icon, start, end }); showToast("تم إضافة العالم", "🌍", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
+       const rewardTitle = document.getElementById('adm-world-reward-title').value.trim(), top10Reward = document.getElementById('adm-world-top10-reward').value.trim();
+       if(!id || !name || !icon || !start || !end) return showToast("أكمل البيانات الأساسية", "⚠️", "error");
+       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', id), { id, name, icon, start, end, rewardTitle, top10Reward, finishersCount: 0 }); showToast("تم حفظ العالم", "🌍", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
+    }
+
+    async function adminAutoGenerateLevels() {
+       const worldId = document.getElementById('adm-auto-lvl-world').value;
+       const w = dbWorlds.find(x => x.id === worldId);
+       if(!w) return showToast("اختر عالم", "⚠️", "error");
+       const c = confirm(`هل أنت متأكد من إنشاء مراحل ${w.start} إلى ${w.end} للعالم ${w.name} تلقائياً؟`);
+       if(c) {
+          showToast("جاري التوليد... قد يستغرق ثواني", "⏳", "info");
+          let proms = [];
+          for(let i=w.start; i<=w.end; i++){
+             proms.push(window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+i), { num: i, world: w.id, q: `لغز المرحلة ${i} في ${w.name}؟ (عدّل السؤال لاحقاً)`, a: 'حل', shards: 20 }));
+          }
+          try { await Promise.all(proms); showToast("تم توليد المراحل بنجاح!", "✅", "success"); } catch(e) { showToast("حدث خطأ أثناء التوليد", "❌", "error"); }
+       }
     }
 
     async function adminSaveLevel() {
@@ -731,34 +872,44 @@
     }
 
     async function adminSaveShopItem() {
-       const name = document.getElementById('adm-shop-title').value.trim(), gems = parseInt(document.getElementById('adm-shop-price-gems').value) || 0, shards = parseInt(document.getElementById('adm-shop-price-shards').value) || 0;
-       if(!name) return showToast("أدخل اسم اللقب", "⚠️", "error");
-       const id = 'title_' + Date.now();
-       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'shop', id), { id, name, gems, shards, type: 'title' }); showToast("أضيف للمتجر", "✅", "success"); document.getElementById('adm-shop-title').value = ''; } catch(e) { showToast("خطأ", "❌", "error"); }
+       const type = document.getElementById('adm-shop-type').value, name = document.getElementById('adm-shop-title').value.trim(), gems = parseInt(document.getElementById('adm-shop-price-gems').value) || 0, shards = parseInt(document.getElementById('adm-shop-price-shards').value) || 0;
+       if(!name) return showToast("أدخل الاسم أو الرابط", "⚠️", "error");
+       const id = type + '_' + Date.now();
+       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'shop', id), { id, type, name, gems, shards }); showToast("أضيف للمتجر", "✅", "success"); document.getElementById('adm-shop-title').value = ''; } catch(e) { showToast("خطأ", "❌", "error"); }
     }
 
     function adminSearchUsers() {
        const q = document.getElementById('adm-search-input').value.trim().toLowerCase(), resDiv = document.getElementById('adm-search-results'); resDiv.innerHTML = '';
-       if(!q) return;
-       const filtered = allUsers.filter(u => u.name.toLowerCase().includes(q));
+       if(!q) return; const filtered = allUsers.filter(u => u.name.toLowerCase().includes(q));
        if(filtered.length === 0) return resDiv.innerHTML = '<p class="text-xs text-center text-gray-500 py-4">لم يتم العثور</p>';
-       filtered.forEach(u => resDiv.innerHTML += `<div class="bg-black/40 border border-white/10 p-3 rounded-xl flex items-center justify-between"><div><h4 class="text-xs font-black text-white">${u.name}</h4><span class="text-[10px] text-gray-400">مرحلة: ${u.currentLevel} | 🧩 ${u.shards}</span></div><button onclick="openPublicProfile('${u.uid}')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">ملف/إهداء</button></div>`);
+       filtered.forEach(u => resDiv.innerHTML += `<div class="bg-black/40 border border-white/10 p-3 rounded-xl flex items-center justify-between"><div><h4 class="text-xs font-black text-white">${u.name}</h4><span class="text-[10px] text-gray-400">مرحلة: ${u.currentLevel} | 🧩 ${u.shards}</span></div><button onclick="openPublicProfile('${u.uid}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">ملف/إهداء</button></div>`);
     }
 
     async function adminCreateCode() {
        const code = document.getElementById('adm-code-name').value.trim().toUpperCase(), gems = parseInt(document.getElementById('adm-code-gems').value) || 0, shards = parseInt(document.getElementById('adm-code-shards').value) || 0, item = document.getElementById('adm-code-item').value.trim();
        if(!code) return showToast("أدخل الرمز", "⚠️", "error");
-       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { code, gems, shards, item, active: true }); showToast("تم الإنشاء", "🎁", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
+       try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { code, gems, shards, item, active: true }); showToast("تم إنشاء الكود", "🎁", "success"); document.getElementById('adm-code-name').value = '';} catch(e) { showToast("خطأ", "❌", "error"); }
+    }
+
+    function renderAdminCodes() {
+       const list = document.getElementById('adm-codes-list'); if(!list) return; list.innerHTML = '';
+       if(dbCodes.length === 0) return list.innerHTML = '<p class="text-xs text-center text-gray-500 py-2">لا يوجد أكواد مسجلة</p>';
+       dbCodes.forEach(c => {
+          list.innerHTML += `<div class="bg-black/40 border ${c.active ? 'border-green-500/30' : 'border-red-500/30'} p-2.5 rounded-xl flex items-center justify-between"><div class="flex-1"><h4 class="text-xs font-black text-white">${c.code} ${c.active ? '✅' : '❌'}</h4><span class="text-[10px] text-gray-400 block mt-0.5">💎 ${c.gems} | 🧩 ${c.shards} ${c.item ? '| 🎁 '+c.item : ''}</span></div><button onclick="adminToggleCode('${c.code}', ${!c.active})" class="${c.active ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-green-500/20 text-green-400 border-green-500/30'} border px-3 py-1.5 rounded-lg text-[10px] font-bold">${c.active ? 'إيقاف' : 'تفعيل'}</button></div>`;
+       });
+    }
+
+    async function adminToggleCode(code, state) {
+        try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { active: state }); showToast("تم تحديث حالة الكود", "✅", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
     }
 
     async function adminSendGiftToUser(shards, gems) {
        if(!viewedUser) return;
-       try { const uRef = window.doc(window.firebaseDb, window.DB_PATH + 'users', viewedUser.uid); await window.updateDoc(uRef, { shards: viewedUser.shards + shards, gems: viewedUser.gems + gems }); showToast(`تم الإرسال`, "🎁", "success"); } catch(e) { showToast("فشل", "❌", "error"); }
+       try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', viewedUser.uid), { shards: viewedUser.shards + shards, gems: viewedUser.gems + gems }); showToast(`تم الإرسال`, "🎁", "success"); } catch(e) { showToast("فشل", "❌", "error"); }
     }
 
     async function adminResetLeaderboard() {
-       const c = confirm("هل أنت متأكد من تصفير حسابات جميع اللاعبين إلى المرحلة 1 وصفر نقاط؟");
-       if(c) {
+       if(confirm("هل أنت متأكد من تصفير حسابات جميع اللاعبين إلى المرحلة 1 وصفر نقاط؟")) {
           showToast("جاري التصفير...", "⏳", "info");
           try {
              const proms = allUsers.map(u => { if(u.email !== OWNER_EMAIL) return window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', u.uid), { currentLevel: 1, shards: 0, gems: 0 }); });
