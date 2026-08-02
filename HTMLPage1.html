@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>لغزك | Lghzak - العوالم الأسطورية</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=El+Messiri:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#fff7ed', 100: '#ffedd5', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 900: '#7c2d12' },
+            game: { bg: '#0f0914', card: '#1b1128', accent: '#ff9900', gold: '#ffd700', darkBg: '#09040d' }
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            messiri: ['El Messiri', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- ربط ملف CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="flex justify-center items-center min-h-screen p-0 md:p-4 bg-gray-950">
+  <div id="app-container" class="w-full max-w-md h-screen md:h-[840px] bg-game-darkBg relative overflow-hidden md:rounded-[3rem] border-0 md:border-4 border-white/10 shadow-2xl flex flex-col">
+    
+    <!-- Toast -->
+    <div id="toast-container" class="absolute top-14 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4">
+      <div id="toast-msg" class="hidden bg-gray-900/95 text-white border border-brand-500/50 px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 -translate-y-10 opacity-0 pointer-events-auto">
+        <span id="toast-icon">✨</span>
+        <span id="toast-text">مرحباً بك!</span>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header id="top-bar" class="hidden relative z-40 bg-gray-950/80 backdrop-blur-md px-3 py-3 border-b border-white/10 flex justify-between items-center shrink-0">
+      <div class="flex items-center gap-2">
+        <button id="header-back-btn" onclick="goBack()" class="hidden bg-brand-500/20 border border-brand-500/40 text-brand-400 hover:bg-brand-500 hover:text-white transition rounded-xl p-2 text-xs flex items-center justify-center w-8 h-8"><i class="fa-solid fa-arrow-right"></i></button>
+        <div onclick="navigateTo('profile')" class="flex items-center gap-2 cursor-pointer group">
+          <div id="header-frame-wrap" class="relative rounded-full">
+            <img id="header-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak" class="w-9 h-9 rounded-full border border-brand-500 bg-game-card object-cover relative z-10" />
+            <span id="header-owner-badge" class="hidden absolute -bottom-2 -right-2 text-[12px] drop-shadow-md z-20">👑</span>
+          </div>
+          <div>
+            <h2 id="header-name" class="text-xs font-black text-white group-hover:text-brand-400 transition">اللاعب</h2>
+            <span id="header-title" class="text-[10px] text-amber-400 font-bold block">مستكشف الألغاز</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="bg-black/60 border border-brand-500/40 rounded-full px-2.5 py-1 flex items-center gap-1"><span class="text-xs">🧩</span><span id="currency-shards" class="text-xs font-black text-brand-400">0</span></div>
+        <div class="bg-black/60 border border-purple-500/40 rounded-full px-2.5 py-1 flex items-center gap-1"><span class="text-xs">💎</span><span id="currency-gems" class="text-xs font-black text-purple-300">0</span></div>
+      </div>
+    </header>
+
+    <main id="main-content" class="flex-1 relative overflow-y-auto overflow-x-hidden">
+      <!-- 1. SPLASH -->
+      <section id="screen-splash" class="absolute inset-0 flex flex-col items-center justify-between p-8 bg-gradient-to-b from-gray-950 via-game-darkBg to-brand-900/60 z-50">
+        <div class="my-auto flex flex-col items-center text-center">
+          <div class="relative mb-6">
+            <div class="w-28 h-28 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-glow-orange border-2 border-white/20 animate-pulse-glow">
+              <span class="text-6xl animate-float">🧩</span>
+            </div>
+            <span class="absolute -bottom-2 -right-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/20 shadow">الإصدار 5.0</span>
+          </div>
+          <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-amber-200 to-yellow-400 font-messiri tracking-wider">لغزك | Lghzak</h1>
+          <p class="text-xs text-gray-400 mt-2 font-bold tracking-wide">عوالم، نوادر، وتحديات أسطورية</p>
+        </div>
+        <div class="w-full max-w-xs flex flex-col items-center">
+          <div class="w-full bg-black/60 h-3.5 rounded-full overflow-hidden p-0.5 border border-white/10 shadow-inner"><div id="loading-bar" class="bg-gradient-to-r from-brand-500 via-amber-400 to-yellow-300 h-full w-0 rounded-full transition-all duration-300 shadow-glow-orange"></div></div>
+          <span class="text-[11px] text-brand-300 font-bold mt-2.5">تحميل العوالم والأحداث...</span>
+        </div>
+      </section>
+
+      <!-- 2. HOME -->
+      <section id="screen-home" class="hidden p-4 space-y-4 pb-20">
+        <div id="daily-reward-banner" class="glass-card-orange p-3 rounded-2xl flex items-center justify-between border border-amber-500/50 relative overflow-hidden hidden">
+           <div class="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-transparent"></div>
+           <div class="flex items-center gap-3 relative z-10">
+              <span class="text-3xl animate-bounce">🎁</span>
+              <div>
+                 <h3 class="text-xs font-black text-amber-300">مكافأتك اليومية جاهزة!</h3>
+                 <p class="text-[10px] text-gray-300 font-bold">افتح صندوق الحظ الآن واستلم هديتك.</p>
+              </div>
+           </div>
+           <button onclick="claimDailyReward()" class="btn-3d-green px-4 py-2 rounded-xl text-xs font-black relative z-10">استلام</button>
+        </div>
+
+        <div class="relative rounded-3xl overflow-hidden glass-card p-5 border border-brand-500/30 text-center">
+          <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 rounded-full blur-2xl"></div>
+          <span class="inline-block bg-brand-500/20 text-brand-400 border border-brand-500/40 text-[11px] font-black px-3 py-1 rounded-full mb-3">✨ لعبة الألغاز العربية الأولى</span>
+          <h2 class="text-2xl font-black text-white font-messiri mb-1">جاهز لتحدي العقول؟</h2>
+          <p class="text-xs text-gray-300 max-w-xs mx-auto mb-4 font-bold">10 عوالم بانتظارك، تصدر قائمة الأساطير!</p>
+          <button onclick="playCurrentLevel()" class="w-full btn-3d-orange py-3.5 rounded-2xl font-black text-lg text-white flex items-center justify-center gap-2"><span>ابدأ اللعب الآن</span><i class="fa-solid fa-play text-sm"></i></button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="navigateTo('worlds')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-cyan-500/30 hover:border-cyan-400 transition"><span class="text-3xl mb-1">🗺️</span><span class="text-xs font-black text-white">العوالم والمراحل</span><span id="home-worlds-count" class="text-[10px] text-cyan-400 mt-0.5 font-bold">عوالم ساحرة</span></button>
+          <button onclick="navigateTo('events')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-purple-500/30 hover:border-purple-400 transition"><span class="text-3xl mb-1">⚔️</span><span class="text-xs font-black text-white">الأحداث والتحديات</span><span class="text-[10px] text-purple-300 mt-0.5 font-bold">جوائز يومية</span></button>
+          <button onclick="navigateTo('shop')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-amber-500/30 hover:border-amber-400 transition"><span class="text-3xl mb-1">💎</span><span class="text-xs font-black text-white">متجر الألغاز</span><span class="text-[10px] text-amber-400 mt-0.5 font-bold">ألقاب وإطارات</span></button>
+          <button onclick="navigateTo('leaderboard')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-yellow-500/30 hover:border-yellow-400 transition"><span class="text-3xl mb-1">🏆</span><span class="text-xs font-black text-white">الترتيب العالمي</span><span class="text-[10px] text-yellow-400 mt-0.5 font-bold">ابحث ونافس</span></button>
+        </div>
+        <div class="glass-card p-4 rounded-2xl flex justify-between items-center border border-white/10">
+          <div class="flex items-center gap-3"><span class="text-2xl">🎁</span><div><h4 class="text-xs font-black text-white">كود هدايا؟</h4><p class="text-[10px] text-gray-400">استرد الرمز هنا</p></div></div>
+          <button onclick="openRedeemModal()" class="btn-3d-purple px-3 py-1.5 rounded-xl text-xs font-black">إدخال الكود</button>
+        </div>
+      </section>
+
+      <!-- 3. WORLDS -->
+      <section id="screen-worlds" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+            <h2 class="text-xl font-black text-white font-messiri flex items-center gap-1.5"><span>🗺️</span> عوالم الألغاز</h2>
+          </div>
+          <span id="worlds-total-badge" class="text-xs text-brand-400 font-bold bg-brand-500/10 border border-brand-500/30 px-3 py-1 rounded-full">0 عالم</span>
+        </div>
+        <div id="worlds-grid" class="space-y-3"></div>
+      </section>
+
+      <!-- 4. LEVELS -->
+      <section id="screen-levels" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex items-center justify-between"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-xs text-gray-300 hover:text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 id="levels-world-title" class="text-lg font-black text-amber-400 font-messiri">المراحل</h2><span class="w-8"></span></div>
+        <div id="levels-grid" class="grid grid-cols-4 gap-3"></div>
+      </section>
+
+      <!-- 5. GAME PLAY -->
+      <section id="screen-game" class="hidden p-4 flex flex-col h-full justify-between pb-20">
+        <div class="flex justify-between items-center glass-card p-3 rounded-2xl border border-white/10">
+          <div class="flex items-center gap-2"><button onclick="goBack()" class="text-gray-300 hover:text-white bg-black/40 p-2 rounded-xl border border-white/10 flex items-center justify-center w-8 h-8"><i class="fa-solid fa-arrow-right"></i></button><span id="game-level-num" class="text-xs font-black text-brand-400">مرحلة 1</span></div>
+          <span class="text-xs text-amber-400 font-bold font-messiri">تحدي الألغاز ✨</span>
+        </div>
+        <div id="game-question-card" class="glass-card p-5 rounded-3xl border border-brand-500/30 text-center my-2 relative overflow-hidden flex flex-col items-center justify-center min-h-[140px]">
+          <span id="game-world-bg-icon" class="absolute -bottom-6 -right-6 text-7xl opacity-10">🧩</span>
+          <h3 id="game-question-text" class="text-base font-black text-white font-messiri leading-relaxed">جاري التحميل...</h3>
+        </div>
+        <div class="glass-card p-3 rounded-2xl border border-amber-500/30 my-1">
+          <div class="text-[11px] font-black text-amber-400 mb-2 flex items-center gap-1.5 justify-center"><span>🛠️ وسائل المساعدة:</span></div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="useHintReveal()" class="bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">💡 كشف حرف</span><span class="text-[10px] text-amber-400 font-bold">15 🧩</span></button>
+            <button onclick="useHintRemoveWrong()" class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">🗑️ حذف خاطئ</span><span class="text-[10px] text-red-400 font-bold">10 🧩</span></button>
+            <button onclick="useHintSkip()" class="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 p-2 rounded-xl text-xs font-black flex flex-col items-center gap-0.5"><span class="text-[10px]">⏭️ تخطي</span><span class="text-[10px] text-purple-300 font-bold">30 🧩</span></button>
+          </div>
+        </div>
+        <div class="my-2"><div id="answer-slots-container" class="flex flex-wrap justify-center gap-2 max-w-xs mx-auto dir-rtl"></div></div>
+        <div class="space-y-3 mt-auto">
+          <div class="flex justify-center gap-4 text-xs font-bold text-gray-300">
+            <button onclick="shuffleLetters()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:text-white"><i class="fa-solid fa-shuffle text-brand-400"></i> خلط الحروف</button>
+            <button onclick="removeLastLetter()" class="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 hover:text-white"><i class="fa-solid fa-backspace text-red-400"></i> مسح حرف</button>
+          </div>
+          <div id="letters-pool-container" class="grid grid-cols-7 gap-1.5 max-w-xs mx-auto dir-rtl"></div>
+        </div>
+      </section>
+
+      <!-- 6. EVENTS -->
+      <section id="screen-events" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">⚔️ الأحداث</h2></div>
+        <div class="glass-card p-5 rounded-2xl text-center border border-white/10"><span class="text-4xl mb-2 block">⏳</span><h3 class="text-lg font-black text-brand-400 font-messiri">قريباً جداً...</h3><p class="text-xs text-gray-400 mt-2">تحديات يومية ومواسم قادمة!</p></div>
+      </section>
+
+      <!-- 7. SHOP -->
+      <section id="screen-shop" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex justify-between items-center"><div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">💎 المتجر</h2></div></div>
+        <div id="shop-items-grid" class="grid grid-cols-2 gap-3"></div>
+      </section>
+
+      <!-- 8. LEADERBOARD -->
+      <section id="screen-leaderboard" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-xl font-black text-white font-messiri">🏆 الصدارة</h2></div>
+        
+        <div class="relative">
+          <input type="text" id="global-search-input" onkeyup="searchPlayersGlobal()" placeholder="ابحث عن لاعب باسمه..." class="w-full bg-black/60 border border-brand-500/30 rounded-2xl py-2.5 px-4 text-xs text-white outline-none focus:border-brand-500 transition shadow-inner" />
+          <i class="fa-solid fa-search absolute left-4 top-3 text-gray-500 text-xs"></i>
+        </div>
+        <div id="global-search-results" class="hidden space-y-2 mt-2"></div>
+
+        <div id="leaderboard-top-3" class="grid grid-cols-3 gap-2 items-end pt-2 pb-2"></div>
+        <div id="leaderboard-list" class="space-y-2"></div>
+      </section>
+
+      <!-- 9. PROFILE -->
+      <section id="screen-profile" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-amber-400 font-bold">الملف الشخصي</span></div>
+        <div class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
+          <div id="profile-frame-wrap" class="relative mb-3 group rounded-full">
+            <img id="profile-avatar-img" src="" class="w-20 h-20 rounded-full border-2 border-brand-500 bg-game-darkBg object-cover relative z-10" />
+            <button onclick="editProfileAvatarCustom()" title="تغيير الصورة من رابط" class="absolute bottom-0 -right-2 bg-brand-500 text-white w-7 h-7 rounded-full text-[11px] border-2 border-game-darkBg flex items-center justify-center hover:bg-brand-400 shadow-lg transition z-20">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+          <div class="flex items-center gap-2"><h3 id="profile-name-text" class="text-lg font-black text-white font-messiri">اللاعب</h3><button onclick="editProfileName()" title="تغيير الاسم" class="text-xs text-amber-400 hover:text-amber-300 bg-black/40 p-1.5 rounded-lg border border-white/10"><i class="fa-solid fa-pen"></i></button></div>
+          <span id="profile-title-badge" class="text-xs bg-brand-600/30 text-brand-300 border border-brand-500/40 px-3 py-0.5 rounded-full font-black mt-1">مستكشف الألغاز</span>
+        </div>
+        
+        <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+          <h4 class="text-xs font-black text-amber-300 font-messiri flex items-center gap-1.5"><span>🎒</span> تجهيز العناصر والنوادر</h4>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">اللقب:</span><select id="equip-title-select" onchange="changeEquippedTitle(this.value)" class="bg-game-card text-yellow-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الصورة:</span><select id="equip-avatar-select" onchange="changeEquippedAvatar(this.value)" class="bg-game-card text-cyan-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الإطار:</span><select id="equip-frame-select" onchange="changeEquippedFrame(this.value)" class="bg-game-card text-purple-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">المرحلة</span><span id="profile-stat-level" class="text-base font-black text-brand-400">1</span></div>
+          <div class="glass-card p-3 rounded-2xl border border-white/10"><span class="text-[10px] text-gray-400 font-bold block">ترتيبك 🏆</span><span id="profile-stat-rank" class="text-base font-black text-yellow-400">-</span></div>
+          <div class="glass-card p-3 rounded-2xl border border-white/10 overflow-hidden"><span class="text-[10px] text-gray-400 font-bold block">حساب</span><span id="profile-email-text" class="text-[9px] font-black text-purple-300 block truncate">زائر</span></div>
+        </div>
+
+        <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+          <div id="auth-buttons-container" class="flex flex-col gap-2"></div>
+          <div id="owner-admin-btn-container" class="hidden pt-2 border-t border-white/10"><button onclick="navigateTo('admin')" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-lg"><span>👑 لوحة تحكم المالك العام</span></button></div>
+        </div>
+      </section>
+
+      <!-- 9B. PUBLIC PROFILE -->
+      <section id="screen-public-profile" class="hidden p-4 space-y-4 pb-20">
+        <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-cyan-400 font-bold">زيارة حساب</span></div>
+        <div id="pub-profile-card" class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
+          <div id="pub-frame-wrap" class="relative mb-3 rounded-full"><img id="pub-avatar-img" src="" class="w-24 h-24 rounded-full border-2 border-cyan-500 bg-game-darkBg object-cover relative z-10" /><span id="pub-owner-badge" class="hidden absolute -bottom-2 -right-2 text-xl drop-shadow-md z-20">👑</span></div>
+          <h3 id="pub-name-text" class="text-xl font-black text-white font-messiri">الاسم</h3>
+          <span id="pub-title-badge" class="text-xs bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 px-3 py-0.5 rounded-full font-black mt-2">لقب</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">🏆</span><span class="text-[10px] text-gray-400 font-bold block">المرحلة</span><span id="pub-stat-level" class="text-xl font-black text-brand-400">1</span></div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">✨</span><span class="text-[10px] text-gray-400 font-bold block">مجموع النقاط</span><span id="pub-stat-score" class="text-xl font-black text-purple-300">0</span></div>
+        </div>
+        <div id="pub-admin-actions" class="hidden glass-card p-4 rounded-3xl border border-red-500/30 space-y-3 mt-4">
+          <h4 class="text-xs font-black text-red-400 font-messiri flex items-center gap-1.5"><span>👑</span> إرسال هدايا للمستخدم</h4>
+          <div class="grid grid-cols-2 gap-2"><button onclick="adminSendGiftToUser(50, 0)" class="btn-3d-orange py-2 rounded-xl text-xs font-black">50 شظية</button><button onclick="adminSendGiftToUser(0, 50)" class="btn-3d-purple py-2 rounded-xl text-xs font-black">50 جوهرة</button></div>
+        </div>
+      </section>
+
+      <!-- 10. ADMIN PANEL -->
+      <section id="screen-admin" class="hidden p-4 space-y-4 pb-20">
+        <!-- أزرار الإدارة و لوحة التحكم (تم الإبقاء عليها كما هي في الكود الأصلي) -->
+        <div class="flex justify-between items-center bg-red-950/60 border border-red-500/50 p-3.5 rounded-2xl shadow-lg">
+          <div class="flex items-center gap-2"><button onclick="goBack()" class="bg-black/50 border border-white/20 text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h2 class="text-lg font-black text-yellow-300 flex items-center gap-1.5 font-messiri"><span>👑</span> لوحة المالك</h2></div>
+        </div>
+
+        <div class="flex flex-wrap gap-1 bg-game-card p-1 rounded-2xl border border-white/10 text-[11px] font-bold text-center">
+          <button onclick="switchAdminTab('levels')" id="admintab-levels" class="flex-1 py-2 px-1 rounded-xl bg-brand-500 text-white font-black">المراحل</button>
+          <button onclick="switchAdminTab('store')" id="admintab-store" class="flex-1 py-2 px-1 rounded-xl text-gray-400">المتجر</button>
+          <button onclick="switchAdminTab('search')" id="admintab-search" class="flex-1 py-2 px-1 rounded-xl text-gray-400">اللاعبين</button>
+          <button onclick="switchAdminTab('gift')" id="admintab-gift" class="flex-1 py-2 px-1 rounded-xl text-gray-400">الأكواد</button>
+          <button onclick="switchAdminTab('danger')" id="admintab-danger" class="flex-1 py-2 px-1 rounded-xl text-red-400">إدارة</button>
+        </div>
+
+        <div id="admin-sec-levels" class="space-y-3">
+          <div class="glass-card p-4 rounded-2xl border border-green-500/30 space-y-3">
+             <h3 class="text-xs font-black text-green-400">إنشاء سريع للعبة كاملة ⚡</h3>
+             <button onclick="adminGenerate10Worlds()" class="w-full btn-3d-green py-2 rounded-xl text-xs font-black">توليد 10 عوالم أسطورية أوتوماتيكياً</button>
+             <div class="flex gap-2 pt-2 border-t border-green-500/30 mt-2">
+                <select id="adm-auto-lvl-world" class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select>
+                <button onclick="adminAutoGenerateLevels()" class="btn-3d-green px-4 rounded-xl text-xs font-black">توليد 100 مرحلة ⚡</button>
+             </div>
+          </div>
+
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-cyan-300">إضافة عالم مخصص</h3>
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-world-id" placeholder="المعرف (مثال: moon)" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="text" id="adm-world-name" placeholder="اسم العالم" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div>
+            <div class="grid grid-cols-3 gap-2"><input type="text" id="adm-world-icon" placeholder="أيقونة 🌍" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white text-center" /><input type="number" id="adm-world-start" placeholder="من مرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-world-end" placeholder="إلى مرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /></div>
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-world-reward-title" placeholder="لقب إنهاء العالم (اختياري)" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-amber-300" /><input type="text" id="adm-world-top10-reward" placeholder="جائزة أول 10 (لقب نادر)" class="bg-black/60 border border-yellow-500/40 rounded-xl p-2 text-xs text-yellow-400" /></div>
+            <button onclick="adminSaveWorld()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ العالم 🌍</button>
+          </div>
+
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-amber-300">إضافة/تعديل مرحلة</h3>
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-lvl-num" placeholder="رقم المرحلة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><select id="adm-lvl-world" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select></div>
+            <input type="text" id="adm-lvl-question" placeholder="السؤال" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
+            <div class="grid grid-cols-2 gap-2"><input type="text" id="adm-lvl-answer" placeholder="الإجابة" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><input type="number" id="adm-lvl-shards" placeholder="الجائزة 🧩" value="20" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <button onclick="adminSaveLevel()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">حفظ المرحلة ➕</button>
+          </div>
+        </div>
+
+        <div id="admin-sec-store" class="hidden space-y-3">
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-purple-300">إضافة عنصر للمتجر</h3>
+            <select id="adm-shop-type" onchange="updateShopInputPlaceholder()" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white mb-2 outline-none">
+               <option value="title">لقب (Title)</option>
+               <option value="avatar">صورة رمزية برابط (Avatar URL)</option>
+               <option value="frame">إطار للصورة (Frame - ذهبي، ناري، نيون، أسطوري)</option>
+            </select>
+            <input type="text" id="adm-shop-title" placeholder="اسم اللقب (مثال: قاهر الألغاز)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-shop-price-gems" placeholder="السعر بالجواهر" value="100" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-shop-price-shards" placeholder="أو بالشظايا" value="500" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <button onclick="adminSaveShopItem()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black">إضافة للمتجر 🛒</button>
+          </div>
+        </div>
+
+        <div id="admin-sec-search" class="hidden space-y-3">
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-cyan-300">بحث عن لاعبين وإدارة</h3>
+            <div class="flex gap-2"><input type="text" id="adm-search-input" placeholder="اسم اللاعب..." class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><button onclick="adminSearchUsers()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">بحث</button></div>
+            <div id="adm-search-results" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <div id="admin-sec-gift" class="hidden space-y-3">
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-yellow-300">كود ترويجي / هدايا</h3>
+            <input type="text" id="adm-code-name" placeholder="الرمز (FREE100)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white uppercase" />
+            <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-code-gems" placeholder="جواهر" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-code-shards" placeholder="شظايا" value="0" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
+            <select id="adm-code-type" onchange="updateCodeItemPlaceholder()" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white outline-none mt-2">
+               <option value="none">بدون عنصر هدية (عملات فقط)</option>
+               <option value="title">إهداء لقب (Title)</option>
+               <option value="avatar">إهداء صورة رمزية (Avatar URL)</option>
+               <option value="frame">إهداء إطار (Frame)</option>
+            </select>
+            <input type="text" id="adm-code-item" placeholder="اسم العنصر أو الرابط" class="hidden w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white mt-2" />
+            <button onclick="adminCreateCode()" class="w-full btn-3d-purple py-2 rounded-xl text-xs font-black mt-2">إنشاء الكود</button>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+            <h3 class="text-xs font-black text-brand-300">إدارة الأكواد الحالية</h3>
+            <div id="adm-codes-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <div id="admin-sec-danger" class="hidden space-y-3">
+          <div class="glass-card p-4 rounded-2xl border border-red-500/30 space-y-3">
+            <h3 class="text-xs font-black text-red-400">تصفير الصدارة</h3>
+            <p class="text-[10px] text-gray-400">إرجاع جميع اللاعبين للمرحلة 1 وتصفير نقاطهم (لن يؤثر على حساب المالك).</p>
+            <button onclick="adminResetLeaderboard()" class="w-full btn-3d-red py-2.5 rounded-xl text-xs font-black">تصفير الجميع ⚠️</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- النوافذ المنبثقة للرسائل والمصادقة (بقيّت كما هي) -->
+    <div id="modal-auth" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-card w-full max-w-xs p-5 rounded-3xl border border-white/20 space-y-3 relative">
+        <button onclick="closeModal('modal-auth')" class="absolute top-3 left-3 text-gray-400 text-xs"><i class="fa-solid fa-xmark text-base"></i></button>
+        <h3 class="text-base font-black text-white text-center font-messiri">تسجيل الدخول</h3>
+        <button onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-gray-200 text-gray-900 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-lg"><i class="fa-brands fa-google text-red-500"></i> الدخول باستخدام Google</button>
+        <div class="relative flex items-center justify-center my-2"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full z-10">أو بالبريد</span><div class="absolute w-full h-px bg-white/10"></div></div>
+        <input type="email" id="auth-email-input" placeholder="البريد الإلكتروني" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-white" />
+        <input type="password" id="auth-pass-input" placeholder="كلمة المرور" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-white" />
+        <button onclick="handleEmailLogin()" class="w-full btn-3d-orange py-2.5 rounded-xl text-xs font-black">دخول / إنشاء حساب</button>
+        <div class="relative flex items-center justify-center my-2"><span class="bg-gray-800 text-[10px] text-gray-400 px-2 rounded-full z-10">أو كزائر</span><div class="absolute w-full h-px bg-white/10"></div></div>
+        <button onclick="handleAnonymousLogin()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition"><i class="fa-solid fa-user-secret"></i> الدخول كزائر</button>
+      </div>
+    </div>
+
+    <div id="modal-redeem" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-card w-full max-w-xs p-5 rounded-3xl border border-brand-500/40 text-center space-y-3 relative">
+        <button onclick="closeModal('modal-redeem')" class="absolute top-3 left-3 text-gray-400 text-xs"><i class="fa-solid fa-xmark text-base"></i></button>
+        <span class="text-3xl">🎁</span><h3 class="text-base font-black text-white font-messiri">استبدال كود</h3>
+        <input type="text" id="redeem-code-input" placeholder="أدخل الكود" class="w-full bg-black/60 border border-white/20 rounded-xl p-2.5 text-xs text-center text-yellow-300 font-black uppercase" />
+        <button onclick="claimPromoCode()" class="w-full btn-3d-orange py-2.5 rounded-xl text-xs font-black">استلام</button>
+      </div>
+    </div>
+
+    <div id="modal-win" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="glass-card-orange w-full max-w-xs p-6 rounded-3xl border border-amber-400 text-center space-y-4 scale-105 shadow-glow-orange"><span class="text-5xl animate-bounce inline-block">🎉</span><h3 class="text-2xl font-black text-amber-300 font-messiri">إجابة صحيحة!</h3><p id="win-reward-text" class="text-xs text-white font-bold"></p><button onclick="nextLevelFromWinModal()" class="w-full btn-3d-orange py-3 rounded-2xl text-sm font-black">المرحلة التالية ➔</button></div>
+    </div>
+
+    <div id="modal-world-complete" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="glass-card w-full max-w-sm p-8 rounded-3xl border-2 border-yellow-400 text-center space-y-4 scale-105 shadow-[0_0_30px_rgba(250,204,21,0.5)]">
+         <span class="text-6xl animate-pulse block">🏆</span>
+         <h3 class="text-3xl font-black text-yellow-400 font-messiri">تهانينا يا أسطورة!</h3>
+         <p class="text-sm text-gray-200 font-bold">أنهيت هذا العالم ببراعة وتجاوزت الصعاب.</p>
+         <div class="bg-black/40 border border-yellow-500/30 p-3 rounded-xl space-y-2">
+            <p class="text-xs text-yellow-300 font-black">مكافآت إتمام العالم:</p>
+            <p class="text-lg font-black text-white">+100 💎 | +500 🧩</p>
+            <p id="world-complete-title-reward" class="text-xs font-bold text-cyan-300"></p>
+         </div>
+         <p id="world-complete-top10" class="text-sm font-black text-amber-400 animate-pulse"></p>
+         <button onclick="closeWorldCompleteAndGoNext()" class="w-full btn-3d-purple py-3 rounded-2xl text-sm font-black mt-2">انتقل للعالم التالي 🚀</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav id="bottom-nav" class="hidden relative z-40 bg-gray-950/90 backdrop-blur-md border-t border-white/10 px-2 py-2 flex justify-around items-center shrink-0">
+      <button onclick="navigateTo('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-brand-500 font-black text-[11px]"><i class="fa-solid fa-house text-base"></i><span>الرئيسية</span></button>
+      <button onclick="navigateTo('worlds')" id="nav-worlds" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-map-location-dot text-base"></i><span>العوالم</span></button>
+      <button onclick="navigateTo('shop')" id="nav-shop" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-store text-base"></i><span>المتجر</span></button>
+      <button onclick="navigateTo('profile')" id="nav-profile" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white text-[11px]"><i class="fa-solid fa-user text-base"></i><span>حسابي</span></button>
+    </nav>
+  </div>
+
+  <!-- FIREBASE IMPORTS (تم الإبقاء على الإعدادات الصحيحة فقط) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0FHhDSALwdi4isWZ5KJLR8yZNbx9ZKD4",
+      authDomain: "lghzak-game-2caa2.firebaseapp.com",
+      projectId: "lghzak-game-2caa2",
+      storageBucket: "lghzak-game-2caa2.firebasestorage.app",
+      messagingSenderId: "483346008570",
+      appId: "1:483346008570:web:935cc51380f28bf0c0bc43",
+      measurementId: "G-QZB9JN523Q"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.firebaseApp = app; window.firebaseAuth = auth; window.firebaseDb = db;
+    window.signInAnonymously = signInAnonymously; window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; window.signOut = signOut;
+    window.GoogleAuthProvider = GoogleAuthProvider; window.signInWithPopup = signInWithPopup;
+    window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc; window.updateDoc = updateDoc; window.collection = collection; window.getDocs = getDocs; window.onSnapshot = onSnapshot;
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'lghzak_v3';
+    window.DB_PATH = `artifacts/${appId}/public/data/`;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) { window.currentUserId = user.uid; await window.loadPlayerData(user); window.setupRealtimeListeners(); } 
+      else { window.currentUserId = null; window.resetPlayerData(); }
+      window.updateUIForAuth();
+    });
+  </script>
+  
+  <!-- ربط ملف JavaScript الخارجي -->
+  <script src="app.js"></script>
+</body>
+</html>
