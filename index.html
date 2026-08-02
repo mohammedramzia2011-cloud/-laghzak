@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>لغزك | Lghzak - لعبة الألغاز والتحديات</title>
+  <title>لغزك | Lghzak - العوالم الأسطورية</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,6 +50,9 @@
     .btn-3d-red { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 4px 0 #7f1d1d, 0 6px 15px rgba(220, 38, 38, 0.4); transition: all 0.1s ease; }
     .btn-3d-red:active { transform: translateY(3px); box-shadow: 0 1px 0 #7f1d1d; }
 
+    .btn-3d-green { background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); box-shadow: 0 4px 0 #14532d, 0 6px 15px rgba(34, 197, 94, 0.4); transition: all 0.1s ease; }
+    .btn-3d-green:active { transform: translateY(3px); box-shadow: 0 1px 0 #14532d; }
+
     @keyframes pulseGlow { 0%, 100% { filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.6)); } 50% { filter: drop-shadow(0 0 25px rgba(249, 115, 22, 0.9)); } }
     .animate-pulse-glow { animation: pulseGlow 2.5s infinite; }
     @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
@@ -62,6 +65,16 @@
     .letter-btn { background: linear-gradient(180deg, #374151 0%, #1f2937 100%); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 0 #111827; border-radius: 0.75rem; font-weight: 800; transition: transform 0.1s; height: 3rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
     .letter-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #111827; }
     .hidden-letter { opacity: 0; pointer-events: none; }
+
+    /* New Frame Styles */
+    .frame-gold { box-shadow: 0 0 10px #fbbf24, inset 0 0 5px #f59e0b; border: 3px solid #fbbf24 !important; }
+    .frame-fire { box-shadow: 0 0 15px #ef4444, inset 0 0 8px #f97316; border: 3px solid #ef4444 !important; animation: pulseFire 1.5s infinite alternate; }
+    @keyframes pulseFire { from { box-shadow: 0 0 5px #ef4444; } to { box-shadow: 0 0 20px #f97316; } }
+    .frame-neon { box-shadow: 0 0 15px #06b6d4, inset 0 0 8px #a855f7; border: 3px solid #06b6d4 !important; animation: pulseNeon 1.5s infinite alternate; }
+    @keyframes pulseNeon { from { box-shadow: 0 0 10px #06b6d4, inset 0 0 5px #06b6d4; } to { box-shadow: 0 0 25px #a855f7, inset 0 0 10px #a855f7; border-color: #a855f7 !important; } }
+    .frame-mythic { background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); background-size: 400%; border: 4px solid transparent !important; animation: glowingMythic 20s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; border-radius: 50%; padding: 2px;}
+    @keyframes glowingMythic { 0% { background-position: 0 0; } 50% { background-position: 400% 0; } 100% { background-position: 0 0; } }
+    .frame-mythic-wrap { position: relative; padding: 3px; border-radius: 50%; background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); background-size: 400%; animation: glowingMythic 10s linear infinite; }
   </style>
 </head>
 
@@ -76,14 +89,14 @@
       </div>
     </div>
 
-    <!-- Header -->
+    <!-- HEADER -->
     <header id="top-bar" class="hidden relative z-40 bg-gray-950/80 backdrop-blur-md px-3 py-3 border-b border-white/10 flex justify-between items-center shrink-0">
       <div class="flex items-center gap-2">
         <button id="header-back-btn" onclick="goBack()" class="hidden bg-brand-500/20 border border-brand-500/40 text-brand-400 hover:bg-brand-500 hover:text-white transition rounded-xl p-2 text-xs flex items-center justify-center w-8 h-8"><i class="fa-solid fa-arrow-right"></i></button>
         <div onclick="navigateTo('profile')" class="flex items-center gap-2 cursor-pointer group">
-          <div class="relative">
-            <img id="header-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak" class="w-9 h-9 rounded-full border border-brand-500 bg-game-card object-cover" />
-            <span id="header-owner-badge" class="hidden absolute -bottom-2 -right-2 text-[12px] drop-shadow-md">👑</span>
+          <div id="header-frame-wrap" class="relative rounded-full">
+            <img id="header-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak" class="w-9 h-9 rounded-full border border-brand-500 bg-game-card object-cover relative z-10" />
+            <span id="header-owner-badge" class="hidden absolute -bottom-2 -right-2 text-[12px] drop-shadow-md z-20">👑</span>
           </div>
           <div>
             <h2 id="header-name" class="text-xs font-black text-white group-hover:text-brand-400 transition">اللاعب</h2>
@@ -105,7 +118,7 @@
             <div class="w-28 h-28 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-glow-orange border-2 border-white/20 animate-pulse-glow">
               <span class="text-6xl animate-float">🧩</span>
             </div>
-            <span class="absolute -bottom-2 -right-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/20 shadow">الإصدار 4.0</span>
+            <span class="absolute -bottom-2 -right-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/20 shadow">الإصدار 5.0</span>
           </div>
           <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-amber-200 to-yellow-400 font-messiri tracking-wider">لغزك | Lghzak</h1>
           <p class="text-xs text-gray-400 mt-2 font-bold tracking-wide">عوالم، نوادر، وتحديات أسطورية</p>
@@ -118,18 +131,33 @@
 
       <!-- 2. HOME -->
       <section id="screen-home" class="hidden p-4 space-y-4 pb-20">
+        
+        <!-- Daily Reward Banner -->
+        <div id="daily-reward-banner" class="glass-card-orange p-3 rounded-2xl flex items-center justify-between border border-amber-500/50 relative overflow-hidden hidden">
+           <div class="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-transparent"></div>
+           <div class="flex items-center gap-3 relative z-10">
+              <span class="text-3xl animate-bounce">🎁</span>
+              <div>
+                 <h3 class="text-xs font-black text-amber-300">مكافأتك اليومية جاهزة!</h3>
+                 <p class="text-[10px] text-gray-300 font-bold">افتح صندوق الحظ الآن واستلم هديتك.</p>
+              </div>
+           </div>
+           <button onclick="claimDailyReward()" class="btn-3d-green px-4 py-2 rounded-xl text-xs font-black relative z-10">استلام</button>
+        </div>
+
         <div class="relative rounded-3xl overflow-hidden glass-card p-5 border border-brand-500/30 text-center">
           <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 rounded-full blur-2xl"></div>
           <span class="inline-block bg-brand-500/20 text-brand-400 border border-brand-500/40 text-[11px] font-black px-3 py-1 rounded-full mb-3">✨ لعبة الألغاز العربية الأولى</span>
           <h2 class="text-2xl font-black text-white font-messiri mb-1">جاهز لتحدي العقول؟</h2>
-          <p class="text-xs text-gray-300 max-w-xs mx-auto mb-4 font-bold">انطلق في العوالم، وتصدر قائمة الأساطير!</p>
+          <p class="text-xs text-gray-300 max-w-xs mx-auto mb-4 font-bold">10 عوالم بانتظارك، تصدر قائمة الأساطير!</p>
           <button onclick="playCurrentLevel()" class="w-full btn-3d-orange py-3.5 rounded-2xl font-black text-lg text-white flex items-center justify-center gap-2"><span>ابدأ اللعب الآن</span><i class="fa-solid fa-play text-sm"></i></button>
         </div>
+        
         <div class="grid grid-cols-2 gap-3">
           <button onclick="navigateTo('worlds')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-cyan-500/30 hover:border-cyan-400 transition"><span class="text-3xl mb-1">🗺️</span><span class="text-xs font-black text-white">العوالم والمراحل</span><span id="home-worlds-count" class="text-[10px] text-cyan-400 mt-0.5 font-bold">عوالم ساحرة</span></button>
           <button onclick="navigateTo('events')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-purple-500/30 hover:border-purple-400 transition"><span class="text-3xl mb-1">⚔️</span><span class="text-xs font-black text-white">الأحداث والتحديات</span><span class="text-[10px] text-purple-300 mt-0.5 font-bold">جوائز يومية</span></button>
-          <button onclick="navigateTo('shop')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-amber-500/30 hover:border-amber-400 transition"><span class="text-3xl mb-1">💎</span><span class="text-xs font-black text-white">متجر الألغاز</span><span class="text-[10px] text-amber-400 mt-0.5 font-bold">ألقاب وصور رمزية</span></button>
-          <button onclick="navigateTo('leaderboard')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-yellow-500/30 hover:border-yellow-400 transition"><span class="text-3xl mb-1">🏆</span><span class="text-xs font-black text-white">الترتيب العالمي</span><span class="text-[10px] text-yellow-400 mt-0.5 font-bold">قائمة الأسطوريين</span></button>
+          <button onclick="navigateTo('shop')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-amber-500/30 hover:border-amber-400 transition"><span class="text-3xl mb-1">💎</span><span class="text-xs font-black text-white">متجر الألغاز</span><span class="text-[10px] text-amber-400 mt-0.5 font-bold">ألقاب وإطارات</span></button>
+          <button onclick="navigateTo('leaderboard')" class="glass-card p-4 rounded-2xl flex flex-col items-center border border-yellow-500/30 hover:border-yellow-400 transition"><span class="text-3xl mb-1">🏆</span><span class="text-xs font-black text-white">الترتيب العالمي</span><span class="text-[10px] text-yellow-400 mt-0.5 font-bold">ابحث ونافس</span></button>
         </div>
         <div class="glass-card p-4 rounded-2xl flex justify-between items-center border border-white/10">
           <div class="flex items-center gap-3"><span class="text-2xl">🎁</span><div><h4 class="text-xs font-black text-white">كود هدايا؟</h4><p class="text-[10px] text-gray-400">استرد الرمز هنا</p></div></div>
@@ -214,9 +242,9 @@
       <section id="screen-profile" class="hidden p-4 space-y-4 pb-20">
         <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-amber-400 font-bold">الملف الشخصي</span></div>
         <div class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
-          <div class="relative mb-3 group">
-            <img id="profile-avatar-img" src="" class="w-20 h-20 rounded-full border-4 border-brand-500 bg-game-darkBg object-cover" />
-            <button onclick="editProfileAvatarCustom()" class="absolute bottom-0 right-0 bg-brand-500 text-white w-7 h-7 rounded-full text-[11px] border-2 border-game-darkBg flex items-center justify-center hover:bg-brand-400 shadow-lg transition">
+          <div id="profile-frame-wrap" class="relative mb-3 group rounded-full">
+            <img id="profile-avatar-img" src="" class="w-20 h-20 rounded-full border-2 border-brand-500 bg-game-darkBg object-cover relative z-10" />
+            <button onclick="editProfileAvatarCustom()" class="absolute bottom-0 -right-2 bg-brand-500 text-white w-7 h-7 rounded-full text-[11px] border-2 border-game-darkBg flex items-center justify-center hover:bg-brand-400 shadow-lg transition z-20">
               <i class="fa-solid fa-camera"></i>
             </button>
           </div>
@@ -225,10 +253,11 @@
         </div>
         
         <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
-          <h4 class="text-xs font-black text-amber-300 font-messiri flex items-center gap-1.5"><span>🎒</span> تجهيز العناصر</h4>
+          <h4 class="text-xs font-black text-amber-300 font-messiri flex items-center gap-1.5"><span>🎒</span> تجهيز العناصر والنوادر</h4>
           <div class="space-y-2 text-xs">
-            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">اللقب المجهز:</span><select id="equip-title-select" onchange="changeEquippedTitle(this.value)" class="bg-game-card text-yellow-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none"></select></div>
-            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الصورة الرمزية:</span><select id="equip-avatar-select" onchange="changeEquippedAvatar(this.value)" class="bg-game-card text-cyan-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">اللقب:</span><select id="equip-title-select" onchange="changeEquippedTitle(this.value)" class="bg-game-card text-yellow-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الصورة الرمزية:</span><select id="equip-avatar-select" onchange="changeEquippedAvatar(this.value)" class="bg-game-card text-cyan-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
+            <div class="flex justify-between items-center bg-black/40 p-2.5 rounded-2xl border border-white/5"><span class="text-gray-300 font-bold text-[11px]">الإطار (Frame):</span><select id="equip-frame-select" onchange="changeEquippedFrame(this.value)" class="bg-game-card text-purple-300 border border-white/15 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none max-w-[150px]"></select></div>
           </div>
         </div>
 
@@ -248,7 +277,7 @@
       <section id="screen-public-profile" class="hidden p-4 space-y-4 pb-20">
         <div class="flex justify-between items-center"><button onclick="goBack()" class="bg-black/50 border border-white/10 text-gray-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrow-right"></i> رجوع</button><span class="text-xs text-cyan-400 font-bold">زيارة حساب</span></div>
         <div id="pub-profile-card" class="glass-card p-5 rounded-3xl border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
-          <div class="relative mb-3"><img id="pub-avatar-img" src="" class="w-24 h-24 rounded-full border-4 border-cyan-500 bg-game-darkBg object-cover" /><span id="pub-owner-badge" class="hidden absolute -bottom-2 -right-2 text-xl drop-shadow-md">👑</span></div>
+          <div id="pub-frame-wrap" class="relative mb-3 rounded-full"><img id="pub-avatar-img" src="" class="w-24 h-24 rounded-full border-2 border-cyan-500 bg-game-darkBg object-cover relative z-10" /><span id="pub-owner-badge" class="hidden absolute -bottom-2 -right-2 text-xl drop-shadow-md z-20">👑</span></div>
           <h3 id="pub-name-text" class="text-xl font-black text-white font-messiri">الاسم</h3>
           <span id="pub-title-badge" class="text-xs bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 px-3 py-0.5 rounded-full font-black mt-2">لقب</span>
         </div>
@@ -257,7 +286,7 @@
           <div class="glass-card p-4 rounded-2xl border border-white/10"><span class="text-3xl mb-1 block">✨</span><span class="text-[10px] text-gray-400 font-bold block">مجموع النقاط</span><span id="pub-stat-score" class="text-xl font-black text-purple-300">0</span></div>
         </div>
         <div id="pub-admin-actions" class="hidden glass-card p-4 rounded-3xl border border-red-500/30 space-y-3 mt-4">
-          <h4 class="text-xs font-black text-red-400 font-messiri flex items-center gap-1.5"><span>👑</span> إرسال هدايا</h4>
+          <h4 class="text-xs font-black text-red-400 font-messiri flex items-center gap-1.5"><span>👑</span> إرسال هدايا للمستخدم</h4>
           <div class="grid grid-cols-2 gap-2"><button onclick="adminSendGiftToUser(50, 0)" class="btn-3d-orange py-2 rounded-xl text-xs font-black">50 شظية</button><button onclick="adminSendGiftToUser(0, 50)" class="btn-3d-purple py-2 rounded-xl text-xs font-black">50 جوهرة</button></div>
         </div>
       </section>
@@ -287,11 +316,11 @@
           </div>
 
           <div class="glass-card p-4 rounded-2xl border border-green-500/30 space-y-3">
-            <h3 class="text-xs font-black text-green-400">توليد مراحل سريعة</h3>
-            <p class="text-[10px] text-gray-300">يولد 100 مرحلة تلقائياً للعالم المحدد بأسئلة مؤقتة لتعديلها لاحقاً.</p>
+            <h3 class="text-xs font-black text-green-400">توليد مراحل سريعة (100 مرحلة)</h3>
+            <p class="text-[10px] text-gray-300">يولد مراحل فارغة من البداية للنهاية للعالم المحدد لتسهيل الإضافة اللاحقة.</p>
             <div class="flex gap-2">
               <select id="adm-auto-lvl-world" class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white"></select>
-              <button onclick="adminAutoGenerateLevels()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">توليد 100 ⚡</button>
+              <button onclick="adminAutoGenerateLevels()" class="btn-3d-green px-4 rounded-xl text-xs font-black">توليد 100 ⚡</button>
             </div>
           </div>
 
@@ -311,6 +340,7 @@
             <select id="adm-shop-type" onchange="updateShopInputPlaceholder()" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white mb-2 outline-none">
                <option value="title">لقب (Title)</option>
                <option value="avatar">صورة رمزية برابط (Avatar URL)</option>
+               <option value="frame">إطار للصورة (Frame)</option>
             </select>
             <input type="text" id="adm-shop-title" placeholder="اسم اللقب (مثال: قاهر الألغاز)" class="w-full bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" />
             <div class="grid grid-cols-2 gap-2"><input type="number" id="adm-shop-price-gems" placeholder="السعر بالجواهر" value="100" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-purple-300" /><input type="number" id="adm-shop-price-shards" placeholder="أو بالشظايا" value="500" class="bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-brand-300" /></div>
@@ -321,13 +351,13 @@
         <!-- Search Tab -->
         <div id="admin-sec-search" class="hidden space-y-3">
           <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
-            <h3 class="text-xs font-black text-cyan-300">بحث عن لاعبين</h3>
+            <h3 class="text-xs font-black text-cyan-300">بحث عن لاعبين وإدارة</h3>
             <div class="flex gap-2"><input type="text" id="adm-search-input" placeholder="اسم اللاعب..." class="flex-1 bg-black/60 border border-white/20 rounded-xl p-2 text-xs text-white" /><button onclick="adminSearchUsers()" class="btn-3d-purple px-4 rounded-xl text-xs font-black">بحث</button></div>
             <div id="adm-search-results" class="space-y-2 max-h-60 overflow-y-auto"></div>
           </div>
         </div>
 
-        <!-- Gifts Tab -->
+        <!-- Gifts/Codes Tab -->
         <div id="admin-sec-gift" class="hidden space-y-3">
           <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
             <h3 class="text-xs font-black text-yellow-300">كود ترويجي / هدايا</h3>
@@ -392,7 +422,7 @@
       <div class="glass-card w-full max-w-sm p-8 rounded-3xl border-2 border-yellow-400 text-center space-y-4 scale-105 shadow-[0_0_30px_rgba(250,204,21,0.5)]">
          <span class="text-6xl animate-pulse block">🏆</span>
          <h3 class="text-3xl font-black text-yellow-400 font-messiri">تهانينا يا أسطورة!</h3>
-         <p class="text-sm text-gray-200 font-bold">أنهيت هذا العالم ببراعة.</p>
+         <p class="text-sm text-gray-200 font-bold">أنهيت هذا العالم ببراعة وتجاوزت الصعاب.</p>
          <div class="bg-black/40 border border-yellow-500/30 p-3 rounded-xl space-y-2">
             <p class="text-xs text-yellow-300 font-black">مكافآت إتمام العالم:</p>
             <p class="text-lg font-black text-white">+100 💎 | +500 🧩</p>
@@ -453,12 +483,14 @@
     const OWNER_EMAIL = "mohammedabudayya2011@gmail.com";
     let screenHistory = ['home'], allUsers = [], dbWorlds = [], dbLevels = [], dbShopItems = [], dbCodes = [];
     
-    // Player State includes avatars now
+    // Player State
     let defaultPlayer = {
-      uid: '', email: '', name: 'زائر', avatar: '',
+      uid: '', email: '', name: 'زائر', 
       currentLevel: 1, shards: 0, gems: 0,
       titles: ['مستكشف الألغاز'], equippedTitle: 'مستكشف الألغاز',
       avatars: ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'], equippedAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak',
+      frames: ['بدون إطار'], equippedFrame: 'بدون إطار', // New Feature
+      lastDaily: '', // Daily Reward Tracker
       isOwner: false
     };
     let player = JSON.parse(JSON.stringify(defaultPlayer));
@@ -467,6 +499,9 @@
     function isOwner() { return player.email === OWNER_EMAIL; }
     function getDisplayGems() { return isOwner() ? "∞" : player.gems; }
     function getDisplayShards() { return isOwner() ? "∞" : player.shards; }
+
+    const frameClassesMap = { 'بدون إطار': '', 'ذهبي': 'frame-gold', 'ناري': 'frame-fire', 'نيون': 'frame-neon', 'أسطوري': 'frame-mythic' };
+    function getFrameClass(frameName) { return frameClassesMap[frameName] || ''; }
 
     // Navigation & UI
     function navigateTo(screenId) {
@@ -479,6 +514,7 @@
       if(screenId === 'admin') populateAdminDropdowns();
       if(screenId === 'shop') renderShopItems();
       if(screenId === 'profile') { calculateProfileRank(); updateUI(); }
+      if(screenId === 'home') checkDailyReward();
     }
     
     function goBack() {
@@ -532,13 +568,15 @@
            player = { ...defaultPlayer, ...snap.data(), uid: user.uid, email: user.email || '' };
            if(!player.avatars) player.avatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'];
            if(!player.equippedAvatar) player.equippedAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
+           if(!player.frames) player.frames = ['بدون إطار'];
+           if(!player.equippedFrame) player.equippedFrame = 'بدون إطار';
         } else {
            player = { ...defaultPlayer, uid: user.uid, email: user.email || '', name: 'لاعب_' + Math.floor(Math.random()*9999) };
            await window.setDoc(userRef, player);
         }
         player.isOwner = (user.email === OWNER_EMAIL);
         
-        // Auto init 3 default worlds if db is completely empty
+        // Auto init 10 Epic worlds if db is completely empty
         const wRef = window.collection(window.firebaseDb, window.DB_PATH + 'worlds');
         const wDocs = await window.getDocs(wRef);
         if(wDocs.empty) { await initializeDefaultWorlds(); }
@@ -549,10 +587,21 @@
 
     async function initializeDefaultWorlds() {
        try {
-         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'forest'), { id: 'forest', name: 'غابة البداية', icon: '🌲', start: 1, end: 100, rewardTitle: 'ملك الغابة', top10Reward: 'أسطورة البدايات', finishersCount: 0 });
-         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'desert'), { id: 'desert', name: 'صحراء الغموض', icon: '🏜️', start: 101, end: 200, rewardTitle: 'فارس الصحراء', top10Reward: 'عقرب الرمال', finishersCount: 0 });
-         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', 'ice'), { id: 'ice', name: 'جبل الجليد', icon: '🏔️', start: 201, end: 300, rewardTitle: 'قاهر الصقيع', top10Reward: 'التنين الثلجي', finishersCount: 0 });
-         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_1'), { num: 1, world: 'forest', q: 'ما هو الشيء الذي يحك رأسه وهو غير عاقل؟', a: 'قلم', shards: 20 });
+         const worlds = [
+            { id: 'w1', name: 'غابة البداية', icon: '🌲', start: 1, end: 100, rewardTitle: 'ملك الغابة', top10Reward: 'أسطورة الغابة', finishersCount: 0 },
+            { id: 'w2', name: 'صحراء الغموض', icon: '🏜️', start: 101, end: 200, rewardTitle: 'فارس الصحراء', top10Reward: 'عقرب الرمال', finishersCount: 0 },
+            { id: 'w3', name: 'جبل الجليد', icon: '🏔️', start: 201, end: 300, rewardTitle: 'قاهر الصقيع', top10Reward: 'التنين الثلجي', finishersCount: 0 },
+            { id: 'w4', name: 'بركان الغضب', icon: '🌋', start: 301, end: 400, rewardTitle: 'سيد النار', top10Reward: 'العنقاء', finishersCount: 0 },
+            { id: 'w5', name: 'أعماق المحيط', icon: '🌊', start: 401, end: 500, rewardTitle: 'حاكم البحار', top10Reward: 'وحش الأعماق', finishersCount: 0 },
+            { id: 'w6', name: 'مدينة السحاب', icon: '☁️', start: 501, end: 600, rewardTitle: 'صقر السماء', top10Reward: 'سيد الرياح', finishersCount: 0 },
+            { id: 'w7', name: 'بوابة المجرة', icon: '🌌', start: 601, end: 700, rewardTitle: 'رائد الفضاء', top10Reward: 'نجم المجرة', finishersCount: 0 },
+            { id: 'w8', name: 'عالم النيون', icon: '🏙️', start: 701, end: 800, rewardTitle: 'المخترق', top10Reward: 'سيد السايبر', finishersCount: 0 },
+            { id: 'w9', name: 'متاهة الزمن', icon: '⏳', start: 801, end: 900, rewardTitle: 'حارس الزمن', top10Reward: 'المسافر عبر الزمن', finishersCount: 0 },
+            { id: 'w10', name: 'قلعة الأساطير', icon: '🏰', start: 901, end: 1000, rewardTitle: 'الأسطورة الخالدة', top10Reward: 'حاكم العوالم', finishersCount: 0 }
+         ];
+         for (let w of worlds) { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', w.id), w); }
+         // Add Level 1 just to prevent crash
+         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_1'), { num: 1, world: 'w1', q: 'ما هو الشيء الذي يحك رأسه وهو غير عاقل؟', a: 'قلم', shards: 20 });
        } catch(e){}
     }
 
@@ -586,6 +635,8 @@
                const data = docSnap.data(); player.shards = data.shards; player.gems = data.gems; player.currentLevel = data.currentLevel; player.name = data.name; 
                player.titles = data.titles || ['مستكشف الألغاز']; player.equippedTitle = data.equippedTitle || 'مستكشف الألغاز';
                player.avatars = data.avatars || ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak']; player.equippedAvatar = data.equippedAvatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
+               player.frames = data.frames || ['بدون إطار']; player.equippedFrame = data.equippedFrame || 'بدون إطار';
+               player.lastDaily = data.lastDaily || '';
                updateUI();
             }
          });
@@ -611,19 +662,29 @@
       document.getElementById('currency-shards').innerText = getDisplayShards(); document.getElementById('currency-gems').innerText = getDisplayGems();
       document.getElementById('header-name').innerText = player.name; document.getElementById('header-title').innerText = player.equippedTitle;
       document.getElementById('header-avatar').src = player.equippedAvatar;
+      document.getElementById('header-frame-wrap').className = `relative rounded-full ${getFrameClass(player.equippedFrame)}`;
+      if(player.equippedFrame === 'أسطوري') document.getElementById('header-frame-wrap').classList.add('frame-mythic-wrap');
+
       document.getElementById('profile-name-text').innerText = player.name; document.getElementById('profile-stat-level').innerText = player.currentLevel;
       document.getElementById('profile-title-badge').innerText = player.equippedTitle; document.getElementById('profile-avatar-img').src = player.equippedAvatar;
+      document.getElementById('profile-frame-wrap').className = `relative mb-3 group rounded-full ${getFrameClass(player.equippedFrame)}`;
+      if(player.equippedFrame === 'أسطوري') document.getElementById('profile-frame-wrap').classList.add('frame-mythic-wrap');
       
       const titleSelect = document.getElementById('equip-title-select'); titleSelect.innerHTML = '';
       player.titles.forEach(t => { titleSelect.innerHTML += `<option value="${t}" ${player.equippedTitle === t ? 'selected' : ''}>${t}</option>`; });
       
       const avatarSelect = document.getElementById('equip-avatar-select'); avatarSelect.innerHTML = '';
       player.avatars.forEach((a, i) => { avatarSelect.innerHTML += `<option value="${a}" ${player.equippedAvatar === a ? 'selected' : ''}>صورة رمزية ${i+1}</option>`; });
+
+      const frameSelect = document.getElementById('equip-frame-select'); frameSelect.innerHTML = '';
+      player.frames.forEach((f) => { frameSelect.innerHTML += `<option value="${f}" ${player.equippedFrame === f ? 'selected' : ''}>${f}</option>`; });
+      
+      checkDailyReward();
     }
 
     async function savePlayer() {
       if(!player.uid) return;
-      try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatars: player.avatars, equippedAvatar: player.equippedAvatar }); } catch(e) {}
+      try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatars: player.avatars, equippedAvatar: player.equippedAvatar, frames: player.frames, equippedFrame: player.equippedFrame, lastDaily: player.lastDaily }); } catch(e) {}
     }
 
     // Login logic
@@ -643,10 +704,31 @@
     async function handleAnonymousLogin() { try { await window.signInAnonymously(window.firebaseAuth); closeModal('modal-auth'); showToast("دخلت كزائر", "✅", "success"); } catch(e) { showToast("خطأ", "❌", "error"); } }
     async function handleLogout() { try { await window.signOut(window.firebaseAuth); showToast("وداعاً", "👋", "success"); } catch(e) {} }
 
+    // Daily Reward
+    function checkDailyReward() {
+       if(screenHistory[screenHistory.length-1] !== 'home') return;
+       const today = new Date().toDateString();
+       const banner = document.getElementById('daily-reward-banner');
+       if(player.uid && player.lastDaily !== today) banner.classList.remove('hidden');
+       else banner.classList.add('hidden');
+    }
+    async function claimDailyReward() {
+       if(!player.uid) return showToast("سجل دخولك أولاً", "🔒", "error");
+       const today = new Date().toDateString();
+       if(player.lastDaily === today) return;
+       const isGem = Math.random() > 0.8; 
+       const amount = isGem ? (Math.floor(Math.random() * 6) + 5) : (Math.floor(Math.random() * 21) + 10);
+       if(isGem) player.gems += amount; else player.shards += amount;
+       player.lastDaily = today; await savePlayer();
+       document.getElementById('daily-reward-banner').classList.add('hidden');
+       showToast(`استلمت مكافأة يومية: ${amount} ${isGem ? '💎' : '🧩'}`, "🎉", "success");
+       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
     // Game Core
     function playCurrentLevel() {
       const lvl = dbLevels.find(l => l.num == player.currentLevel);
-      if(!lvl) return showToast("قريباً مراحل جديدة!", "🚀", "info");
+      if(!lvl) return showToast("أنت أسطورة! أنهيت كل المراحل الحالية.", "🚀", "info");
       loadLevel(lvl); navigateTo('game');
     }
 
@@ -683,6 +765,32 @@
       while(availableLetters.length < 14) availableLetters.push(arabicLetters[Math.floor(Math.random() * arabicLetters.length)]);
       availableLetters = availableLetters.sort(() => Math.random() - 0.5).map((char, index) => ({ id: index, char: char, used: false }));
       renderGameUI();
+    }
+
+    function useHintReveal() {
+      if(player.shards < 15 && !isOwner()) return showToast("رصيد الشظايا غير كافِ", "⚠️", "error");
+      const emptyIndex = currentSlots.findIndex(s => s === null);
+      if(emptyIndex === -1) return;
+      const correctChar = currentLevelObj.a[emptyIndex];
+      const targetLetter = availableLetters.find(l => !l.used && l.char === correctChar);
+      if(targetLetter) {
+         if(!isOwner()) player.shards -= 15; savePlayer(); updateUI();
+         targetLetter.used = true; currentSlots[emptyIndex] = targetLetter; renderGameUI();
+      }
+    }
+    function useHintRemoveWrong() {
+       if(player.shards < 10 && !isOwner()) return showToast("رصيد الشظايا غير كافِ", "⚠️", "error");
+       const wrongLetters = availableLetters.filter(l => !l.used && !currentLevelObj.a.includes(l.char));
+       if(wrongLetters.length > 0) {
+          if(!isOwner()) player.shards -= 10; savePlayer(); updateUI();
+          wrongLetters[0].used = true; renderGameUI();
+       } else showToast("لا يوجد حروف خاطئة زائدة!", "💡", "info");
+    }
+    function useHintSkip() {
+       if(player.shards < 30 && !isOwner()) return showToast("رصيد الشظايا غير كافِ", "⚠️", "error");
+       if(!isOwner()) player.shards -= 30; savePlayer(); updateUI();
+       document.getElementById('win-reward-text').innerText = `تم تخطي المرحلة!`;
+       openModal('modal-win');
     }
 
     function renderGameUI() {
@@ -732,7 +840,7 @@
                }
             }
             await savePlayer();
-            document.getElementById('world-complete-title-reward').innerText = currentWorld.rewardTitle ? `+ لقب: ${currentWorld.rewardTitle}` : '';
+            document.getElementById('world-complete-title-reward').innerText = currentWorld.rewardTitle ? `+ لقب الإتمام: ${currentWorld.rewardTitle}` : '';
             document.getElementById('world-complete-top10').innerText = gotTop10 ? `🎉 مبروك! أنت من أول 10 أساطير أنهوا العالم! جائزتك: ${currentWorld.top10Reward}` : '';
             openModal('modal-world-complete'); return;
          }
@@ -749,14 +857,23 @@
           let isOwned = false;
           if(item.type === 'title') isOwned = player.titles.includes(item.name);
           else if(item.type === 'avatar') isOwned = player.avatars.includes(item.name);
+          else if(item.type === 'frame') isOwned = player.frames.includes(item.name);
+
+          let visual = '';
+          if(item.type === 'avatar') visual = `<img src="${item.name}" class="w-12 h-12 rounded-full mb-2 bg-black/50 border border-cyan-500"/>`;
+          else if(item.type === 'frame') {
+             const cls = getFrameClass(item.name);
+             visual = `<div class="w-12 h-12 rounded-full mb-2 bg-black/50 ${cls} ${cls===''?'border border-white/20':''} ${item.name==='أسطوري'?'frame-mythic-wrap':''}"></div><span class="text-xs font-black text-purple-300 mb-2">إطار: ${item.name}</span>`;
+          }
+          else visual = `<span class="text-xs font-black text-brand-300 mb-2">لقب: ${item.name}</span>`;
 
           grid.innerHTML += `
-             <div class="glass-card p-3 rounded-2xl border ${isOwned ? 'border-green-500/50' : 'border-white/10'} text-center flex flex-col items-center">
-                ${item.type === 'avatar' ? `<img src="${item.name}" class="w-12 h-12 rounded-full mb-2 bg-black/50 border border-cyan-500"/>` : `<span class="text-xs font-black text-brand-300 mb-2">لقب: ${item.name}</span>`}
-                ${isOwned ? `<span class="text-[10px] text-green-400 font-bold bg-green-500/20 px-2 py-1 rounded-full mb-1 w-full">مملوك</span>` : 
-                `<div class="flex gap-1 w-full mb-1">
-                   ${item.gems > 0 ? `<button onclick="buyShopItem('${item.id}', 'gems', ${item.gems})" class="flex-1 bg-purple-600/30 text-purple-300 text-[10px] font-bold py-1.5 rounded-lg border border-purple-500/40">${item.gems} 💎</button>` : ''}
-                   ${item.shards > 0 ? `<button onclick="buyShopItem('${item.id}', 'shards', ${item.shards})" class="flex-1 bg-brand-600/30 text-brand-300 text-[10px] font-bold py-1.5 rounded-lg border border-brand-500/40">${item.shards} 🧩</button>` : ''}
+             <div class="glass-card p-3 rounded-2xl border ${isOwned ? 'border-green-500/50' : 'border-white/10'} text-center flex flex-col items-center justify-between">
+                ${visual}
+                ${isOwned ? `<span class="text-[10px] text-green-400 font-bold bg-green-500/20 px-2 py-1 rounded-full w-full">مملوك</span>` : 
+                `<div class="flex gap-1 w-full mt-2">
+                   ${item.gems > 0 ? `<button onclick="buyShopItem('${item.id}', 'gems', ${item.gems})" class="flex-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-[10px] font-bold py-1.5 rounded-lg border border-purple-500/40 transition">${item.gems} 💎</button>` : ''}
+                   ${item.shards > 0 ? `<button onclick="buyShopItem('${item.id}', 'shards', ${item.shards})" class="flex-1 bg-brand-600/30 hover:bg-brand-600/50 text-brand-300 text-[10px] font-bold py-1.5 rounded-lg border border-brand-500/40 transition">${item.shards} 🧩</button>` : ''}
                 </div>`}
              </div>
           `;
@@ -769,6 +886,7 @@
        player[currency] -= cost; 
        if(item.type === 'title') player.titles.push(item.name);
        else if(item.type === 'avatar') player.avatars.push(item.name);
+       else if(item.type === 'frame') player.frames.push(item.name);
        await savePlayer(); renderShopItems(); showToast(`تم الشراء بنجاح`, "🎉", "success");
     }
 
@@ -790,12 +908,14 @@
 
        const list = document.getElementById('leaderboard-list'); list.innerHTML = '';
        sorted.slice(3).forEach((u, i) => {
-          list.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-white/5 cursor-pointer hover:bg-white/5"><div class="flex items-center gap-3"><span class="text-xs font-black text-gray-500 w-4">${i+4}</span><div class="relative"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px]">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-black/50 text-gray-400 px-2 py-1 rounded-lg text-[10px] border border-white/10 flex gap-1 items-center"><i class="fa-solid fa-eye"></i> زيارة</button></div>`;
+          const frameCls = getFrameClass(u.equippedFrame);
+          list.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-white/5 cursor-pointer hover:bg-white/5"><div class="flex items-center gap-3"><span class="text-xs font-black text-gray-500 w-4">${i+4}</span><div class="relative rounded-full ${frameCls} ${u.equippedFrame==='أسطوري'?'frame-mythic-wrap':''}"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg relative z-10" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px] z-20">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-black/50 text-gray-400 px-2 py-1 rounded-lg text-[10px] border border-white/10 flex gap-1 items-center"><i class="fa-solid fa-eye"></i> زيارة</button></div>`;
        });
     }
 
     function buildTopCard(u, icon, color, isFirst=false) {
-       return `<div onclick="openPublicProfile('${u.uid}')" class="glass-card${isFirst?'-orange scale-105 shadow-glow-orange border-amber-400 border-2' : ` border border-${color}-500/30`} p-3 rounded-2xl text-center flex flex-col items-center cursor-pointer"><span class="text-${isFirst?'2xl':'lg'} mb-1">${icon}</span><div class="relative mb-1"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-${isFirst?'12':'10'} h-${isFirst?'12':'10'} rounded-full border border-${color}-400" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-xs">👑</span>` : ''}</div><span class="text-[11px] font-black text-${isFirst?'yellow-300':'white'} truncate w-full">${u.name}</span><span class="text-[10px] text-${color}-400 font-bold">مرحلة ${u.currentLevel}</span></div>`;
+       const frameCls = getFrameClass(u.equippedFrame);
+       return `<div onclick="openPublicProfile('${u.uid}')" class="glass-card${isFirst?'-orange scale-105 shadow-glow-orange border-amber-400 border-2' : ` border border-${color}-500/30`} p-3 rounded-2xl text-center flex flex-col items-center cursor-pointer"><span class="text-${isFirst?'2xl':'lg'} mb-1">${icon}</span><div class="relative mb-1 rounded-full ${frameCls} ${u.equippedFrame==='أسطوري'?'frame-mythic-wrap':''}"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-${isFirst?'12':'10'} h-${isFirst?'12':'10'} rounded-full border border-${color}-400 relative z-10" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-xs z-20">👑</span>` : ''}</div><span class="text-[11px] font-black text-${isFirst?'yellow-300':'white'} truncate w-full mt-1">${u.name}</span><span class="text-[10px] text-${color}-400 font-bold">مرحلة ${u.currentLevel}</span></div>`;
     }
 
     // Public Profile
@@ -807,6 +927,11 @@
        document.getElementById('pub-title-badge').innerText = viewedUser.equippedTitle || 'مستكشف الألغاز';
        document.getElementById('pub-stat-level').innerText = viewedUser.currentLevel;
        document.getElementById('pub-stat-score').innerText = (viewedUser.currentLevel * 100) + viewedUser.shards;
+       
+       const fWrap = document.getElementById('pub-frame-wrap');
+       fWrap.className = `relative mb-3 rounded-full ${getFrameClass(viewedUser.equippedFrame)}`;
+       if(viewedUser.equippedFrame === 'أسطوري') fWrap.classList.add('frame-mythic-wrap');
+
        if(viewedUser.email === OWNER_EMAIL) { document.getElementById('pub-owner-badge').classList.remove('hidden'); document.getElementById('pub-name-text').classList.add('text-amber-400'); } else { document.getElementById('pub-owner-badge').classList.add('hidden'); document.getElementById('pub-name-text').classList.remove('text-amber-400'); }
        if(isOwner() && viewedUser.email !== OWNER_EMAIL) document.getElementById('pub-admin-actions').classList.remove('hidden'); else document.getElementById('pub-admin-actions').classList.add('hidden');
        navigateTo('public-profile');
@@ -815,6 +940,7 @@
     // Profile Settings
     async function changeEquippedTitle(title) { player.equippedTitle = title; await savePlayer(); updateUI(); showToast("تم تغيير اللقب", "✅", "success"); }
     async function changeEquippedAvatar(avatarUrl) { player.equippedAvatar = avatarUrl; await savePlayer(); updateUI(); showToast("تم تغيير الصورة", "✅", "success"); }
+    async function changeEquippedFrame(frame) { player.equippedFrame = frame; await savePlayer(); updateUI(); showToast("تم تغيير الإطار", "✅", "success"); }
     async function editProfileName() { const newName = prompt("أدخل اسمك الجديد:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await savePlayer(); updateUI(); showToast("تم التحديث", "✅", "success"); } }
     
     async function editProfileAvatarCustom() {
@@ -841,7 +967,8 @@
        if(filtered.length === 0) return resDiv.innerHTML = '<div class="glass-card p-4 text-center text-gray-400 text-xs rounded-2xl">لم يتم العثور على اللاعب. تأكد من الاسم!</div>';
        
        filtered.forEach((u, i) => {
-          resDiv.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-brand-500/30 cursor-pointer hover:bg-white/5 transition"><div class="flex items-center gap-3"><div class="relative"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg object-cover" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px]">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-brand-500/20 text-brand-400 px-3 py-1.5 rounded-xl text-[10px] font-bold flex gap-1 items-center"><i class="fa-solid fa-eye"></i> زيارة</button></div>`;
+          const frameCls = getFrameClass(u.equippedFrame);
+          resDiv.innerHTML += `<div onclick="openPublicProfile('${u.uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between border border-brand-500/30 cursor-pointer hover:bg-white/5 transition"><div class="flex items-center gap-3"><div class="relative rounded-full ${frameCls} ${u.equippedFrame==='أسطوري'?'frame-mythic-wrap':''}"><img src="${u.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.name}`}" class="w-10 h-10 rounded-full border border-gray-600 bg-game-darkBg object-cover relative z-10" />${u.email === OWNER_EMAIL ? `<span class="absolute -bottom-1 -right-1 text-[10px] z-20">👑</span>` : ''}</div><div><h4 class="text-xs font-black text-white ${u.email === OWNER_EMAIL ? 'text-amber-400' : ''}">${u.name}</h4><span class="text-[10px] text-brand-400 font-bold">مرحلة ${u.currentLevel}</span></div></div><button class="bg-brand-500/20 text-brand-400 px-3 py-1.5 rounded-xl text-[10px] font-bold flex gap-1 items-center"><i class="fa-solid fa-eye"></i> زيارة</button></div>`;
        });
     }
 
@@ -851,7 +978,7 @@
        if(!codeInput) return showToast("أدخل الكود", "⚠️", "error"); if(!player.uid) return showToast("يجب تسجيل الدخول", "🔒", "error");
        try {
           const codeRef = window.doc(window.firebaseDb, window.DB_PATH + 'codes', codeInput); const snap = await window.getDoc(codeRef);
-          if(!snap.exists() || !snap.data().active) return showToast("كود غير صالح", "❌", "error");
+          if(!snap.exists() || !snap.data().active) return showToast("كود غير صالح أو منتهي", "❌", "error");
           const claimedRef = window.doc(window.firebaseDb, window.DB_PATH + `users/${player.uid}/claimedCodes`, codeInput);
           if((await window.getDoc(claimedRef)).exists()) return showToast("استخدمت الكود مسبقاً", "⚠️", "error");
           
@@ -862,6 +989,7 @@
           
           await savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
           closeModal('modal-redeem'); showToast(msg, "🎉", "success"); document.getElementById('redeem-code-input').value = '';
+          confetti();
        } catch(e) { showToast("خطأ", "❌", "error"); }
     }
 
@@ -888,6 +1016,7 @@
        const type = document.getElementById('adm-shop-type').value;
        const input = document.getElementById('adm-shop-title');
        if(type === 'avatar') input.placeholder = "رابط الصورة (URL) من الإنترنت";
+       else if(type === 'frame') input.placeholder = "اسم الإطار (ناري, نيون, ذهبي, أسطوري)";
        else input.placeholder = "اسم اللقب (مثال: قاهر الألغاز)";
     }
 
@@ -907,7 +1036,7 @@
           showToast("جاري التوليد... قد يستغرق ثواني", "⏳", "info");
           let proms = [];
           for(let i=w.start; i<=w.end; i++){
-             proms.push(window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+i), { num: i, world: w.id, q: `لغز المرحلة ${i} في ${w.name}؟ (عدّل السؤال لاحقاً)`, a: 'حل', shards: 20 }));
+             proms.push(window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+i), { num: i, world: w.id, q: `لغز المرحلة ${i} المتصاعد في الصعوبة لعالم ${w.name}؟ (عليك تعديله)`, a: 'تعديل', shards: 20 + Math.floor(i/10) }));
           }
           try { await Promise.all(proms); showToast("تم توليد المراحل بنجاح!", "✅", "success"); } catch(e) { showToast("حدث خطأ أثناء التوليد", "❌", "error"); }
        }
@@ -957,7 +1086,7 @@
     }
 
     async function adminResetLeaderboard() {
-       if(confirm("هل أنت متأكد من تصفير حسابات جميع اللاعبين إلى المرحلة 1 وصفر نقاط؟")) {
+       if(confirm("تحذير خطير: هل أنت متأكد من تصفير حسابات جميع اللاعبين إلى المرحلة 1 وصفر نقاط؟")) {
           showToast("جاري التصفير...", "⏳", "info");
           try {
              const proms = allUsers.map(u => { if(u.email !== OWNER_EMAIL) return window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', u.uid), { currentLevel: 1, shards: 0, gems: 0 }); });
