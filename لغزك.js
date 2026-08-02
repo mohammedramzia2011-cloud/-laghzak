@@ -8,6 +8,7 @@ let defaultPlayer = {
   titles: ['مستكشف الألغاز'], equippedTitle: 'مستكشف الألغاز',
   avatars: ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'], equippedAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak',
   frames: ['بدون إطار'], equippedFrame: 'بدون إطار',
+  banners: ['بدون بنر'], equippedBanner: 'بدون بنر',
   lastDaily: '', isOwner: false
 };
 let player = JSON.parse(JSON.stringify(defaultPlayer));
@@ -87,6 +88,8 @@ window.loadPlayerData = async (user) => {
        if(!player.equippedAvatar) player.equippedAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
        if(!player.frames) player.frames = ['بدون إطار'];
        if(!player.equippedFrame) player.equippedFrame = 'بدون إطار';
+       if(!player.banners) player.banners = ['بدون بنر'];
+       if(!player.equippedBanner) player.equippedBanner = 'بدون بنر';
     } else {
        player = { ...defaultPlayer, uid: user.uid, email: user.email || '', name: 'لاعب_' + Math.floor(Math.random()*9999) };
        await window.setDoc(userRef, player);
@@ -127,6 +130,7 @@ window.setupRealtimeListeners = () => {
            player.titles = data.titles || ['مستكشف الألغاز']; player.equippedTitle = data.equippedTitle || 'مستكشف الألغاز';
            player.avatars = data.avatars || ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak']; player.equippedAvatar = data.equippedAvatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak';
            player.frames = data.frames || ['بدون إطار']; player.equippedFrame = data.equippedFrame || 'بدون إطار';
+           player.banners = data.banners || ['بدون بنر']; player.equippedBanner = data.equippedBanner || 'بدون بنر';
            player.lastDaily = data.lastDaily || '';
            updateUI();
         }
@@ -161,6 +165,15 @@ function updateUI() {
   document.getElementById('profile-frame-wrap').className = `relative mb-3 group rounded-full ${getFrameClass(player.equippedFrame)}`;
   if(player.equippedFrame === 'أسطوري') document.getElementById('profile-frame-wrap').classList.add('frame-mythic-wrap');
   
+  const profileCard = document.getElementById('profile-card-container');
+  if(player.equippedBanner && player.equippedBanner !== 'بدون بنر') {
+      profileCard.style.backgroundImage = `url('${player.equippedBanner}')`;
+      profileCard.style.backgroundSize = 'cover';
+      profileCard.style.backgroundPosition = 'center';
+  } else {
+      profileCard.style.backgroundImage = 'none';
+  }
+  
   const titleSelect = document.getElementById('equip-title-select'); titleSelect.innerHTML = '';
   player.titles.forEach(t => { titleSelect.innerHTML += `<option value="${t}" ${player.equippedTitle === t ? 'selected' : ''}>${t}</option>`; });
   
@@ -170,12 +183,15 @@ function updateUI() {
   const frameSelect = document.getElementById('equip-frame-select'); frameSelect.innerHTML = '';
   player.frames.forEach((f) => { frameSelect.innerHTML += `<option value="${f}" ${player.equippedFrame === f ? 'selected' : ''}>${f}</option>`; });
   
+  const bannerSelect = document.getElementById('equip-banner-select'); bannerSelect.innerHTML = '';
+  player.banners.forEach((b, i) => { bannerSelect.innerHTML += `<option value="${b}" ${player.equippedBanner === b ? 'selected' : ''}>${b === 'بدون بنر' ? 'بدون بنر' : 'بنر ' + i}</option>`; });
+
   checkDailyReward();
 }
 
 async function savePlayer() {
   if(!player.uid) return;
-  try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatars: player.avatars, equippedAvatar: player.equippedAvatar, frames: player.frames, equippedFrame: player.equippedFrame, lastDaily: player.lastDaily }); } catch(e) {}
+  try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { name: player.name, currentLevel: player.currentLevel, shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, equippedTitle: player.equippedTitle, titles: player.titles, avatars: player.avatars, equippedAvatar: player.equippedAvatar, frames: player.frames, equippedFrame: player.equippedFrame, banners: player.banners, equippedBanner: player.equippedBanner, lastDaily: player.lastDaily }); } catch(e) {}
 }
 
 // Login logic
@@ -346,9 +362,11 @@ function renderShopItems() {
       if(item.type === 'title') isOwned = player.titles.includes(item.name);
       else if(item.type === 'avatar') isOwned = player.avatars.includes(item.name);
       else if(item.type === 'frame') isOwned = player.frames.includes(item.name);
+      else if(item.type === 'banner') isOwned = player.banners.includes(item.name);
 
       let visual = '';
       if(item.type === 'avatar') visual = `<img src="${item.name}" class="w-12 h-12 rounded-full mb-2 bg-black/50 border border-cyan-500 object-cover"/>`;
+      else if(item.type === 'banner') visual = `<div class="w-full h-12 rounded-xl mb-2 bg-black/50 border border-pink-500 object-cover" style="background-image:url('${item.name}'); background-size:cover; background-position:center;"></div>`;
       else if(item.type === 'frame') {
          const cls = getFrameClass(item.name);
          visual = `<div class="w-12 h-12 rounded-full mb-2 bg-black/50 flex items-center justify-center text-xs ${cls} ${cls===''?'border border-white/20':''} ${item.name==='أسطوري'?'frame-mythic-wrap':''}">🖼️</div><span class="text-xs font-black text-purple-300 mb-2">إطار: ${item.name}</span>`;
@@ -375,6 +393,7 @@ async function buyShopItem(id, currency, cost) {
    if(item.type === 'title') player.titles.push(item.name);
    else if(item.type === 'avatar') player.avatars.push(item.name);
    else if(item.type === 'frame') player.frames.push(item.name);
+   else if(item.type === 'banner') player.banners.push(item.name);
    await savePlayer(); renderShopItems(); showToast(`تم الشراء بنجاح`, "🎉", "success");
 }
 
@@ -426,6 +445,7 @@ function openPublicProfile(uid) {
 async function changeEquippedTitle(title) { player.equippedTitle = title; await savePlayer(); updateUI(); showToast("تم تغيير اللقب", "✅", "success"); }
 async function changeEquippedAvatar(avatarUrl) { player.equippedAvatar = avatarUrl; await savePlayer(); updateUI(); showToast("تم تغيير الصورة", "✅", "success"); }
 async function changeEquippedFrame(frame) { player.equippedFrame = frame; await savePlayer(); updateUI(); showToast("تم تغيير الإطار", "✅", "success"); }
+async function changeEquippedBanner(banner) { player.equippedBanner = banner; await savePlayer(); updateUI(); showToast("تم تغيير البنر", "✅", "success"); }
 async function editProfileName() { const newName = prompt("أدخل اسمك الجديد:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await savePlayer(); updateUI(); showToast("تم التحديث", "✅", "success"); } }
 
 async function editProfileAvatarCustom() {
@@ -473,6 +493,7 @@ async function claimPromoCode() {
          if(data.itemType === 'title' && !player.titles.includes(data.itemValue)) { player.titles.push(data.itemValue); msg += `لقب (${data.itemValue}) `; }
          if(data.itemType === 'avatar' && !player.avatars.includes(data.itemValue)) { player.avatars.push(data.itemValue); msg += `صورة شخصية جديدة `; }
          if(data.itemType === 'frame' && !player.frames.includes(data.itemValue)) { player.frames.push(data.itemValue); msg += `إطار (${data.itemValue}) `; }
+         if(data.itemType === 'banner' && !player.banners.includes(data.itemValue)) { player.banners.push(data.itemValue); msg += `بنر خلفية جديد `; }
       }
       
       await savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
@@ -504,6 +525,7 @@ function updateShopInputPlaceholder() {
    const input = document.getElementById('adm-shop-title');
    if(type === 'avatar') input.placeholder = "رابط الصورة (URL) من الإنترنت";
    else if(type === 'frame') input.placeholder = "اسم الإطار (ذهبي, ناري, نيون, أسطوري)";
+   else if(type === 'banner') input.placeholder = "رابط البنر للخلفية (URL)";
    else input.placeholder = "اسم اللقب (مثال: قاهر الألغاز)";
 }
 
@@ -514,6 +536,7 @@ function updateCodeItemPlaceholder() {
    else { 
       input.classList.remove('hidden'); 
       if(type === 'avatar') input.placeholder = "رابط الصورة كهدية";
+      else if(type === 'banner') input.placeholder = "رابط البنر كهدية";
       else input.placeholder = `اسم الـ ${type === 'title' ? 'اللقب' : 'الإطار'} الهدية`;
    }
 }
