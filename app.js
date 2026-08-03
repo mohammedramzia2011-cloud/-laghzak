@@ -1,223 +1,545 @@
+// ==========================================
+// 1. حالة اللعبة والبيانات التشغيلية (State)
+// ==========================================
 let screenHistory = ['home'];
-let player = { uid: 'user123', email: 'test@test.com', name: 'اللاعب', shards: 100, gems: 10, lastDaily: '' };
-let currentLevelObj = null, currentSlots = [], availableLetters = [];
 
-// 1. نظام التنقل
+let player = {
+    uid: 'guest_998',
+    email: '',
+    name: 'اللاعب الأسطوري',
+    shards: 150,
+    gems: 20,
+    level: 1,
+    currentWorld: 1,
+    equippedTitle: 'مستكشف الألغاز',
+    equippedAvatar: 'LghzakPlayer',
+    equippedFrame: 'border-brand-500',
+    inventoryTitles: ['مستكشف الألغاز', 'بطل العوالم', 'ملك الألغاز'],
+    inventoryAvatars: ['LghzakPlayer', 'RobotAlpha', 'WizardKing'],
+    inventoryFrames: ['border-brand-500', 'border-purple-500', 'border-yellow-400'],
+    lastDailyReward: '',
+    isAdmin: false
+};
+
+let currentLevelObj = null;
+let currentSlots = [];
+let availableLetters = [];
+
+// قاعدة بيانات كود الهدايا المؤقتة
+window.tempCodes = {
+    'LGHZAK2026': 300,
+    'WELCOME': 100
+};
+
+// ==========================================
+// 2. نظام التنقل والواجهات (Navigation System)
+// ==========================================
 function navigateTo(screenId) {
-  document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-  document.getElementById(`screen-${screenId}`).classList.remove('hidden');
-  if (screenHistory[screenHistory.length - 1] !== screenId && screenId !== 'splash') screenHistory.push(screenId);
-  
-  if(screenId === 'home') checkDailyReward();
+    // إخفاء جميع الشاشات
+    const screens = document.querySelectorAll('main > section');
+    screens.forEach(s => s.classList.add('hidden'));
+
+    // إظهار الشاشة المطلوبة
+    const targetScreen = document.getElementById(`screen-${screenId}`);
+    if (targetScreen) {
+        targetScreen.classList.remove('hidden');
+    }
+
+    // إدارة شريط التنقل العلوي والسفلي
+    const topBar = document.getElementById('top-bar');
+    const backBtn = document.getElementById('header-back-btn');
+    
+    if (screenId === 'splash') {
+        topBar.classList.add('hidden');
+    } else {
+        topBar.classList.remove('hidden');
+    }
+
+    if (screenId === 'home' || screenId === 'splash') {
+        backBtn.classList.add('hidden');
+    } else {
+        backBtn.classList.remove('hidden');
+    }
+
+    // إضافة إلى سجل التنقل
+    if (screenHistory[screenHistory.length - 1] !== screenId && screenId !== 'splash') {
+        screenHistory.push(screenId);
+    }
+
+    // أفعال إضافية عند فتح شاشات معينة
+    if (screenId === 'home') {
+        checkDailyReward();
+    } else if (screenId === 'worlds') {
+        renderWorldsList();
+    } else if (screenId === 'profile') {
+        renderInventoryUI();
+    }
+
+    updatePlayerHeaderUI();
 }
+
 function goBack() {
-  if (screenHistory.length > 1) { screenHistory.pop(); navigateTo(screenHistory.pop()); } 
-  else { navigateTo('home'); }
+    if (screenHistory.length > 1) {
+        screenHistory.pop(); // حذف الشاشة الحالية
+        const previousScreen = screenHistory.pop();
+        navigateTo(previousScreen);
+    } else {
+        navigateTo('home');
+    }
 }
 
+// إشعارات Toast
 function showToast(msg, icon = '✨', type = 'info') {
-  const toast = document.getElementById('toast-msg');
-  document.getElementById('toast-text').innerText = msg; document.getElementById('toast-icon').innerText = icon;
-  toast.className = 'bg-gray-900/95 text-white border px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 pointer-events-auto z-[100] border-brand-500';
-  toast.classList.remove('-translate-y-10', 'opacity-0');
-  setTimeout(() => { toast.classList.add('-translate-y-10', 'opacity-0'); }, 3000);
+    const toast = document.getElementById('toast-msg');
+    const toastText = document.getElementById('toast-text');
+    const toastIcon = document.getElementById('toast-icon');
+
+    toastText.innerText = msg;
+    toastIcon.innerText = icon;
+
+    toast.classList.remove('-translate-y-10', 'opacity-0', 'hidden');
+    
+    setTimeout(() => {
+        toast.classList.add('-translate-y-10', 'opacity-0');
+        setTimeout(() => toast.classList.add('hidden'), 300);
+    }, 3000);
 }
 
-// 2. إصلاح تعليق تسجيل الدخول بوضع Try/Catch/Finally
+// تحديث بيانات الهيدر العلوي
+function updatePlayerHeaderUI() {
+    document.getElementById('currency-shards').innerText = player.shards;
+    document.getElementById('currency-gems').innerText = player.gems;
+    document.getElementById('header-name').innerText = player.name;
+    document.getElementById('header-title').innerText = player.equippedTitle;
+    document.getElementById('header-avatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${player.equippedAvatar}`;
+    
+    const frameWrap = document.getElementById('header-frame-wrap');
+    frameWrap.className = `relative rounded-full p-0.5 border-2 ${player.equippedFrame}`;
+}
+
+// ==========================================
+// 3. حل مشكلة تسجيل الدخول (Safe Login Fix)
+// ==========================================
 async function loginUserSafe() {
     const btn = document.getElementById('login-btn');
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-pass').value;
-    
-    if(!email || !pass) return showToast("أدخل الإيميل وكلمة المرور", "⚠️");
+    const emailInput = document.getElementById('login-email').value.trim();
+    const passInput = document.getElementById('login-pass').value.trim();
 
+    if (!emailInput || !passInput) {
+        showToast("يرجى إدخال البريد الإلكتروني وكلمة المرور", "⚠️");
+        return;
+    }
+
+    // 1. تغيير حالة الزر لمنع التكرار
     btn.disabled = true;
-    btn.innerText = "جاري التحميل...";
+    btn.innerText = "جاري الاتصال بالسيرفر...";
 
     try {
-        // افترض أن هذا هو كود الفايربيس الخاص بك
-        // await window.signInWithEmailAndPassword(window.auth, email, pass);
+        // محاكاة الاتصال بالسيرفر أو الفايربيس
+        // await window.signInWithEmailAndPassword(window.auth, emailInput, passInput);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+
+        player.email = emailInput;
+        player.name = emailInput.split('@')[0];
         
-        // محاكاة انتظار السيرفر
-        await new Promise(r => setTimeout(r, 1000));
-        
-        showToast("تم تسجيل الدخول بنجاح!", "✅", "success");
+        showToast("تم تسجيل الدخول وتحديث البيانات بنجاح!", "✅");
+        updatePlayerHeaderUI();
         navigateTo('home');
-        
+
     } catch (error) {
         console.error("Login Error:", error);
-        showToast("حدث خطأ في السيرفر أو الإنترنت ضعيف", "❌", "error");
+        showToast("حدث خطأ أثناء تسجيل الدخول! تأكد من شبكة الإنترنت", "❌");
     } finally {
-        // إرجاع الزر لوضعه الطبيعي دائماً حتى لو فشل الاتصال كي لا يعلق
+        // 2. الأهم: فك تجميد الزر دائماً لمنع التعليق
         btn.disabled = false;
         btn.innerText = "تسجيل الدخول / حساب جديد";
     }
 }
 
-// 3. إصلاح وتأمين الصندوق اليومي
-function checkDailyReward() {
-   const today = new Date().toDateString();
-   const banner = document.getElementById('daily-reward-banner');
-   if(player.lastDaily !== today) { banner.classList.remove('hidden'); } 
-   else { banner.classList.add('hidden'); }
-}
-
-async function claimDailyReward() {
-   const btn = document.getElementById('daily-reward-btn');
-   btn.disabled = true;
-
-   try {
-       player.lastDaily = new Date().toDateString(); 
-       player.shards += 50;
-       // await savePlayer(); (حفظ في قاعدة البيانات)
-       
-       document.getElementById('daily-reward-banner').classList.add('hidden');
-       showToast("استلمت مكافأة يومية: 50 🧩", "🎉", "success");
-       if(typeof confetti !== 'undefined') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-       
-   } catch (e) {
-       showToast("خطأ بالاتصال، حاول مجدداً", "❌", "error");
-   } finally {
-       btn.disabled = false;
-   }
-}
-
-// 4. نظام الهدايا الأكيد (إنشاء الكود كمالك + استخدامه كلاعب)
+// ==========================================
+// 4. نظام كود الهدايا المضمون (Promo Codes)
+// ==========================================
 async function adminCreatePromoCodeUI() {
-    const codeName = document.getElementById('admin-promo-name').value.trim();
-    const amount = parseInt(document.getElementById('admin-promo-amount').value);
-    
-    if(!codeName || isNaN(amount)) return showToast("أدخل بيانات الكود صحيحة", "⚠️");
+    const nameInput = document.getElementById('admin-promo-name').value.trim().toUpperCase();
+    const amountInput = parseInt(document.getElementById('admin-promo-amount').value);
+
+    if (!nameInput || isNaN(amountInput) || amountInput <= 0) {
+        showToast("يرجى أدخل اسم الكود وقيمة الشظايا بشكل صحيح", "⚠️");
+        return;
+    }
 
     try {
-        // كود الفايربيس (محاكاة هنا)
-        // await setDoc(doc(db, "codes", codeName), { isValid: true, reward: amount });
+        // إضافة الكود للذاكرة/الفايربيس
+        window.tempCodes[nameInput] = amountInput;
         
-        // للاختبار محلياً:
-        window.tempCodes = window.tempCodes || {};
-        window.tempCodes[codeName] = amount;
-        
-        showToast("تم إنشاء كود الهدية بنجاح!", "👑", "success");
+        showToast(`تم إنشاء كود الهدية (${nameInput}) بقيمة ${amountInput} شظية!`, "👑");
+        document.getElementById('admin-promo-name').value = '';
+        document.getElementById('admin-promo-amount').value = '';
+
     } catch (error) {
-        showToast("خطأ في رفع الكود", "❌", "error");
+        showToast("خطأ أثناء حفظ الكود بالسيرفر", "❌");
     }
 }
 
 async function redeemCode() {
-    const inputCode = document.getElementById('redeem-input').value.trim();
-    if(!inputCode) return showToast("أدخل الكود أولاً", "⚠️");
-    
+    const inputCode = document.getElementById('redeem-input').value.trim().toUpperCase();
+
+    if (!inputCode) {
+        showToast("يرجى كتابة رمز الهدية أولاً", "⚠️");
+        return;
+    }
+
     try {
-        // فحص الفايربيس
-        // const codeSnap = await getDoc(doc(db, "codes", inputCode));
-        
         if (window.tempCodes && window.tempCodes[inputCode]) {
-            let reward = window.tempCodes[inputCode];
-            player.shards += reward;
-            delete window.tempCodes[inputCode]; // إبطال الكود
+            let rewardShards = window.tempCodes[inputCode];
+            player.shards += rewardShards;
             
-            showToast(`مبروك! حصلت على ${reward} شظية 🧩`, "🎁", "success");
+            // إلغاء الكود بعد الاستخدام
+            delete window.tempCodes[inputCode];
+
+            showToast(`مبروك! حصلت على ${rewardShards} شظية 🧩`, "🎁");
             document.getElementById('redeem-input').value = '';
+            updatePlayerHeaderUI();
+
+            if (typeof confetti !== 'undefined') {
+                confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+            }
         } else {
-            showToast("الكود غير صحيح أو تم استخدامه مسبقاً", "❌", "error");
+            showToast("رمز الهدية غير صحيح أو تم استخدامه مسبقاً", "❌");
         }
     } catch (error) {
-        showToast("حدث خطأ في السيرفر", "❌", "error");
+        showToast("حدث خطأ أثناء فحص رمز الهدية", "❌");
     }
 }
 
-// 5. توليد 10 عوالم وأسئلة الصور وترتيب الأحرف
+// ==========================================
+// 5. نظام الحقيبة وتجهيز العناصر (Inventory)
+// ==========================================
+function renderInventoryUI() {
+    const titleSelect = document.getElementById('equip-title-select');
+    const avatarSelect = document.getElementById('equip-avatar-select');
+    const frameSelect = document.getElementById('equip-frame-select');
+
+    // تعبئة الألقاب المملوكة
+    titleSelect.innerHTML = '';
+    player.inventoryTitles.forEach(t => {
+        titleSelect.innerHTML += `<option value="${t}" ${player.equippedTitle === t ? 'selected' : ''}>${t}</option>`;
+    });
+
+    // تعبئة الصور المملوكة
+    avatarSelect.innerHTML = '';
+    player.inventoryAvatars.forEach(a => {
+        avatarSelect.innerHTML += `<option value="${a}" ${player.equippedAvatar === a ? 'selected' : ''}>${a}</option>`;
+    });
+
+    // تعبئة الإطارات المملوكة
+    frameSelect.innerHTML = '';
+    player.inventoryFrames.forEach(f => {
+        let fName = f === 'border-brand-500' ? 'برتقالي' : f === 'border-purple-500' ? 'بنفسجي' : 'ذهبي';
+        frameSelect.innerHTML += `<option value="${f}" ${player.equippedFrame === f ? 'selected' : ''}>إطار ${fName}</option>`;
+    });
+}
+
+function equipTitle(val) {
+    player.equippedTitle = val;
+    updatePlayerHeaderUI();
+    showToast(`تم تجهيز اللقب: ${val}`, "🏷️");
+}
+
+function equipAvatar(val) {
+    player.equippedAvatar = val;
+    updatePlayerHeaderUI();
+    showToast("تم تحديث الصورة الرمزية", "🖼️");
+}
+
+function equipFrame(val) {
+    player.equippedFrame = val;
+    updatePlayerHeaderUI();
+    showToast("تم تغيير إطار البروفايل", "✨");
+}
+
+// ==========================================
+// 6. مولد العوالم والمراحل الضخم (10 العوالم)
+// ==========================================
+let generatedWorldsData = [];
+
 async function adminGenerateMassiveGame() {
-   if(!confirm("سيتم إضافة 10 عوالم و 1000 مرحلة، هل أنت متأكد؟")) return;
-   showToast("جاري التوليد... يرجى الانتظار", "⏳");
-   
-   const words = ['قمر','شمس','تفاحة','شجرة'];
-   const imgQuestions = [
-       { q: 'ما هذا الشيء؟', a: 'تفاحة', img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6f46d?w=200&q=80' },
-       { q: 'ما هو هذا الحيوان؟', a: 'قطة', img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&q=80' }
-   ];
+    if (!confirm("هل تريد توليد 10 عوالم تحتوي على 1000 مرحلة الآن؟")) return;
 
-   try {
-       // حلقة لـ 10 عوالم
-       for (let wId = 1; wId <= 10; wId++) {
-           let startLvl = (wId - 1) * 100 + 1;
-           let endLvl = wId * 100;
-           
-           // إنشاء العالم
-           // await setDoc(doc(db, "worlds", "w"+wId), { name: "عالم "+wId, start: startLvl, end: endLvl });
-           
-           // إنشاء 100 مرحلة لهذا العالم
-           for(let lvl = startLvl; lvl <= endLvl; lvl++){
-               let qType = Math.random();
-               let levelData = { num: lvl, world: "w"+wId, shards: 25 };
-               
-               if (qType > 0.6) {
-                   // سؤال صورة
-                   let rand = imgQuestions[Math.floor(Math.random() * imgQuestions.length)];
-                   levelData.q = rand.q; levelData.a = rand.a; levelData.img = rand.img;
-               } else {
-                   // سؤال ترتيب أحرف عادي
-                   levelData.q = "رتب الأحرف لتكوين الكلمة"; 
-                   levelData.a = words[Math.floor(Math.random() * words.length)];
-               }
-               // await setDoc(doc(db, "levels", "lvl_"+lvl), levelData);
-           }
-       }
-       showToast("تم توليد العوالم والمراحل بنجاح!", "🔥", "success");
-   } catch(e) { 
-       showToast("حدث خطأ أثناء التوليد", "❌", "error"); 
-   }
+    showToast("جاري توليد العوالم والمراحل...", "⏳");
+
+    const sampleImages = [
+        { q: 'ما هذا الشيء في الصورة؟', a: 'تفاحة', img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6f46d?w=300&q=80' },
+        { q: 'ما هو هذا الحيوان؟', a: 'قطة', img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&q=80' },
+        { q: 'ما هذا المشروب؟', a: 'قهوة', img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&q=80' }
+    ];
+
+    const sampleWords = ['سيارة', 'طائرة', 'مدرسة', 'كمبيوتر', 'هاتف', 'شمس', 'قمر', 'كوكب'];
+
+    generatedWorldsData = [];
+
+    for (let w = 1; w <= 10; w++) {
+        let worldObj = {
+            id: w,
+            name: `العالم ${w}: ${w === 1 ? 'عالم البداية' : w === 2 ? 'عالم الغابة' : 'العالم الأسطوري ' + w}`,
+            startLevel: (w - 1) * 100 + 1,
+            endLevel: w * 100,
+            levels: []
+        };
+
+        for (let l = worldObj.startLevel; l <= worldObj.endLevel; l++) {
+            if (l % 2 === 0) {
+                // مرحلة مصورة
+                let imgItem = sampleImages[l % sampleImages.length];
+                worldObj.levels.push({
+                    num: l,
+                    q: imgItem.q,
+                    a: imgItem.a,
+                    img: imgItem.img,
+                    shardsReward: 20
+                });
+            } else {
+                // مرحلة نصية
+                let word = sampleWords[l % sampleWords.length];
+                worldObj.levels.push({
+                    num: l,
+                    q: 'رتب الأحرف لتشكيل الكلمة الصحيحة',
+                    a: word,
+                    img: null,
+                    shardsReward: 15
+                });
+            }
+        }
+
+        generatedWorldsData.push(worldObj);
+    }
+
+    showToast("تم توليد 10 عوالم و 1000 مرحلة بنجاح!", "🔥");
+    renderWorldsList();
 }
 
-// 6. تحميل وتشغيل المرحلة (تتضمن فحص الصورة وترتيب الحروف)
-function loadLevel(lvlData) {
-  currentLevelObj = lvlData; 
-  document.getElementById('game-level-num').innerText = `مرحلة ${lvlData.num}`; 
-  document.getElementById('game-question-text').innerText = lvlData.q;
-  
-  // إظهار الصورة إذا كانت موجودة في المرحلة
-  const imgContainer = document.getElementById('game-question-image');
-  if (lvlData.img) {
-      imgContainer.innerHTML = `<img src="${lvlData.img}" class="w-32 h-32 object-cover rounded-xl border-2 border-brand-500 shadow-lg mx-auto" />`;
-      imgContainer.classList.remove('hidden');
-  } else {
-      imgContainer.innerHTML = '';
-      imgContainer.classList.add('hidden');
-  }
+function renderWorldsList() {
+    const container = document.getElementById('worlds-list-container');
+    container.innerHTML = '';
 
-  currentSlots = Array(lvlData.a.length).fill(null);
-  
-  // خلط الأحرف
-  const arabicLetters = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'; 
-  availableLetters = lvlData.a.split('');
-  while(availableLetters.length < 14) {
-      availableLetters.push(arabicLetters[Math.floor(Math.random() * arabicLetters.length)]);
-  }
-  availableLetters = availableLetters.sort(() => Math.random() - 0.5).map((char, index) => ({ id: index, char: char, used: false }));
-  
-  renderGameUI();
+    if (generatedWorldsData.length === 0) {
+        // إنشاء عوالم افتراضية للعرض
+        adminGenerateMassiveGame();
+        return;
+    }
+
+    generatedWorldsData.forEach(w => {
+        container.innerHTML += `
+            <div class="glass-card p-4 rounded-3xl border border-white/10 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-black text-amber-300 font-messiri">${w.name}</h3>
+                    <p class="text-[10px] text-gray-400">المراحل: من ${w.startLevel} إلى ${w.endLevel}</p>
+                </div>
+                <button onclick="startWorld(${w.id})" class="btn-3d-orange px-3.5 py-1.5 rounded-xl text-xs font-black">
+                    دخول
+                </button>
+            </div>
+        `;
+    });
 }
 
-function renderGameUI() {
-  const slotsContainer = document.getElementById('answer-slots-container'); 
-  slotsContainer.innerHTML = '';
-  currentSlots.forEach((slot, index) => { slotsContainer.innerHTML += `<div onclick="removeLetterFromSlot(${index})" class="letter-slot shadow-inner">${slot ? slot.char : ''}</div>`; });
-  
-  const poolContainer = document.getElementById('letters-pool-container'); 
-  poolContainer.innerHTML = '';
-  availableLetters.forEach(l => { poolContainer.innerHTML += `<button onclick="addLetterToSlot(${l.id})" class="letter-btn ${l.used ? 'hidden-letter' : ''}">${l.char}</button>`; });
+function startWorld(worldId) {
+    player.currentWorld = worldId;
+    let world = generatedWorldsData.find(w => w.id === worldId);
+    if (world && world.levels.length > 0) {
+        loadLevelObject(world.levels[0]);
+        navigateTo('game');
+    }
 }
 
-function addLetterToSlot(letterId) { const emptyIndex = currentSlots.findIndex(s => s === null); if (emptyIndex !== -1) { const l = availableLetters.find(x => x.id === letterId); if(l && !l.used) { l.used = true; currentSlots[emptyIndex] = l; renderGameUI(); } } }
-function removeLetterFromSlot(slotIndex) { const slot = currentSlots[slotIndex]; if (slot) { const l = availableLetters.find(x => x.id === slot.id); if(l) l.used = false; currentSlots[slotIndex] = null; renderGameUI(); } }
-function removeLastLetter() { for(let i=currentSlots.length-1; i>=0; i--){ if(currentSlots[i] !== null) { removeLetterFromSlot(i); break; } } }
-function shuffleLetters() { availableLetters.sort(() => Math.random() - 0.5); renderGameUI(); }
-
+// ==========================================
+// 7. محرك وقواعد اللعبة (Game Engine)
+// ==========================================
 function playCurrentLevel() {
+    if (generatedWorldsData.length === 0) {
+        adminGenerateMassiveGame();
+    }
+    let firstLevel = generatedWorldsData[0].levels[0];
+    loadLevelObject(firstLevel);
     navigateTo('game');
-    // تشغيل مرحلة تجريبية للاختبار
-    loadLevel({ num: 1, q: "ما هو هذا الحيوان؟", a: "قطة", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&q=80", shards: 20 });
 }
 
-// تشغيل الواجهة
-setTimeout(() => { document.getElementById('screen-splash').classList.add('hidden'); navigateTo('home'); }, 2000);
+function loadLevelObject(levelObj) {
+    currentLevelObj = levelObj;
+    
+    document.getElementById('game-level-num').innerText = `المرحلة ${levelObj.num}`;
+    document.getElementById('game-question-text').innerText = levelObj.q;
+
+    // معالجة صورة السؤال
+    const imgDiv = document.getElementById('game-question-image');
+    if (levelObj.img) {
+        imgDiv.innerHTML = `<img src="${levelObj.img}" class="w-36 h-36 object-cover rounded-2xl border-2 border-brand-500 shadow-xl mx-auto" />`;
+        imgDiv.classList.remove('hidden');
+    } else {
+        imgDiv.innerHTML = '';
+        imgDiv.classList.add('hidden');
+    }
+
+    // تجهيز خانات الإجابة
+    currentSlots = Array(levelObj.a.length).fill(null);
+
+    // تجهيز مجمعة الحروف
+    const arabicChars = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
+    let letters = levelObj.a.split('');
+    
+    while (letters.length < 14) {
+        letters.push(arabicChars[Math.floor(Math.random() * arabicChars.length)]);
+    }
+
+    availableLetters = letters.sort(() => Math.random() - 0.5).map((char, index) => ({
+        id: index,
+        char: char,
+        used: false
+    }));
+
+    renderGameSlotsAndPool();
+}
+
+function renderGameSlotsAndPool() {
+    // عرض الخانات
+    const slotsDiv = document.getElementById('answer-slots-container');
+    slotsDiv.innerHTML = '';
+    currentSlots.forEach((slot, idx) => {
+        slotsDiv.innerHTML += `
+            <div onclick="removeLetterFromSlot(${idx})" class="letter-slot shadow-md">
+                ${slot ? slot.char : ''}
+            </div>
+        `;
+    });
+
+    // عرض الحروف
+    const poolDiv = document.getElementById('letters-pool-container');
+    poolDiv.innerHTML = '';
+    availableLetters.forEach(l => {
+        poolDiv.innerHTML += `
+            <button onclick="addLetterToSlot(${l.id})" class="letter-btn ${l.used ? 'hidden-letter' : ''}">
+                ${l.char}
+            </button>
+        `;
+    });
+}
+
+function addLetterToSlot(letterId) {
+    const emptySlotIdx = currentSlots.findIndex(s => s === null);
+    if (emptySlotIdx !== -1) {
+        const item = availableLetters.find(x => x.id === letterId);
+        if (item && !item.used) {
+            item.used = true;
+            currentSlots[emptySlotIdx] = item;
+            renderGameSlotsAndPool();
+            checkAnswerCondition();
+        }
+    }
+}
+
+function removeLetterFromSlot(slotIdx) {
+    const slotItem = currentSlots[slotIdx];
+    if (slotItem) {
+        const item = availableLetters.find(x => x.id === slotItem.id);
+        if (item) item.used = false;
+        currentSlots[slotIdx] = null;
+        renderGameSlotsAndPool();
+    }
+}
+
+function removeLastLetter() {
+    for (let i = currentSlots.length - 1; i >= 0; i--) {
+        if (currentSlots[i] !== null) {
+            removeLetterFromSlot(i);
+            break;
+        }
+    }
+}
+
+function shuffleLetters() {
+    availableLetters.sort(() => Math.random() - 0.5);
+    renderGameSlotsAndPool();
+}
+
+function checkAnswerCondition() {
+    if (currentSlots.every(s => s !== null)) {
+        let userWord = currentSlots.map(s => s.char).join('');
+        if (userWord === currentLevelObj.a) {
+            player.shards += currentLevelObj.shardsReward;
+            showToast(`إجابة صحيحة! حصلت على ${currentLevelObj.shardsReward} شظية 🧩`, "🎉");
+            
+            if (typeof confetti !== 'undefined') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            setTimeout(() => {
+                let nextNum = currentLevelObj.num + 1;
+                showToast(`جاري الانقال للمرحلة ${nextNum}`, "🚀");
+            }, 1500);
+        } else {
+            showToast("إجابة خاطئة! حاول مرة أخرى", "❌");
+        }
+    }
+}
+
+function useHint() {
+    if (player.shards < 20) {
+        showToast("لا تملك شظايا كافية للتلميح!", "⚠️");
+        return;
+    }
+    player.shards -= 20;
+    updatePlayerHeaderUI();
+    showToast(`الكلمة هي: (${currentLevelObj.a})`, "💡");
+}
+
+// ==========================================
+// 8. نظام المكافأة اليومية والصناديق
+// ==========================================
+function checkDailyReward() {
+    const today = new Date().toDateString();
+    const banner = document.getElementById('daily-reward-banner');
+    if (player.lastDailyReward !== today) {
+        banner.classList.remove('hidden');
+    } else {
+        banner.classList.add('hidden');
+    }
+}
+
+function claimDailyReward() {
+    player.lastDailyReward = new Date().toDateString();
+    player.shards += 50;
+    document.getElementById('daily-reward-banner').classList.add('hidden');
+    updatePlayerHeaderUI();
+    showToast("استلمت 50 شظية مجاناً!", "🎁");
+}
+
+function openCrate(type) {
+    if (type === 'common') {
+        if (player.shards < 100) return showToast("تحتاج إلى 100 شظية!", "⚠️");
+        player.shards -= 100;
+        showToast("فتحت الصندوق العادي وحصلت على لقب جديد!", "📦");
+    } else {
+        if (player.gems < 50) return showToast("تحتاج إلى 50 جوهرة!", "⚠️");
+        player.gems -= 50;
+        showToast("فتحت الصندوق الأسطوري وحصلت على إطار نادر!", "👑");
+    }
+    updatePlayerHeaderUI();
+}
+
+function buyShardsWithGems() {
+    if (player.gems < 10) return showToast("لا تملك جواهر كافية!", "⚠️");
+    player.gems -= 10;
+    player.shards += 500;
+    updatePlayerHeaderUI();
+    showToast("تم شراء 500 شظية بنجاح!", "💎");
+}
+
+// ==========================================
+// 9. تشغيل اللعبة الأولي عند التحميل
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.getElementById('screen-splash').classList.add('hidden');
+        navigateTo('home');
+    }, 1800);
+});
