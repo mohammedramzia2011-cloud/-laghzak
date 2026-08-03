@@ -1,33 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-import { getAuth, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCuRvU6LFqDtIAGDbKFqiv4MceF9RXZSmc",
-    authDomain: "lghzak-game.firebaseapp.com",
-    projectId: "lghzak-game",
-    storageBucket: "lghzak-game.firebasestorage.app",
-    messagingSenderId: "1035374695888",
-    appId: "1:1035374695888:web:e022bb94cafd76816c55d5",
-    measurementId: "G-0QYPL62Y8P"
-};
-
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app); 
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.firebaseApp = app; window.firebaseAuth = auth; window.firebaseDb = db; window.firebaseAnalytics = analytics;
-window.signInAnonymously = signInAnonymously; window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; window.signOut = signOut; window.GoogleAuthProvider = GoogleAuthProvider; window.signInWithPopup = signInWithPopup; window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc; window.updateDoc = updateDoc; window.deleteDoc = deleteDoc; window.collection = collection; window.getDocs = getDocs; window.onSnapshot = onSnapshot;
-
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'lghzak_v3';
-window.DB_PATH = `artifacts/${appId}/public/data/`;
-
 const OWNER_EMAIL = "mohammedabudayya2011@gmail.com";
 let screenHistory = ['home'], allUsers = [], dbWorlds = [], dbLevels = [], dbShopItems = [], dbCodes = [], dbCrates = [];
 
-// إعطاء الزائر عملات ابتدائية عشان يقدر يجرب
+// الزائر بياخذ عملات ابتدائية للتجربة 
 let defaultPlayer = {
   uid: '', email: '', name: 'زائر', 
   currentLevel: 1, shards: 100, gems: 50,
@@ -41,34 +15,34 @@ let defaultPlayer = {
 let player = JSON.parse(JSON.stringify(defaultPlayer));
 let currentLevelObj = null, currentSlots = [], availableLetters = [];
 
-window.isOwner = function() { return player.email === OWNER_EMAIL; }
-window.getDisplayGems = function() { return window.isOwner() ? "∞" : player.gems; }
-window.getDisplayShards = function() { return window.isOwner() ? "∞" : player.shards; }
+function isOwner() { return player.email === OWNER_EMAIL; }
+function getDisplayGems() { return isOwner() ? "∞" : player.gems; }
+function getDisplayShards() { return isOwner() ? "∞" : player.shards; }
 
 const frameClassesMap = { 'بدون إطار': '', 'ذهبي': 'frame-gold', 'ناري': 'frame-fire', 'نيون': 'frame-neon', 'أسطوري': 'frame-mythic' };
 function getFrameClass(frameName) { return frameClassesMap[frameName] || ''; }
 
-window.navigateTo = function(screenId) {
+function navigateTo(screenId) {
   document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
   document.getElementById(`screen-${screenId}`).classList.remove('hidden');
   if (screenHistory[screenHistory.length - 1] !== screenId && screenId !== 'splash') screenHistory.push(screenId);
-  window.updateNavStyles(screenId);
+  updateNavStyles(screenId);
   
-  if(screenId === 'worlds') window.renderWorldsGrid();
-  if(screenId === 'leaderboard') window.renderLeaderboard();
-  if(screenId === 'admin') window.populateAdminDropdowns();
-  if(screenId === 'shop') window.renderShopItems();
-  if(screenId === 'crates') window.renderCrates();
-  if(screenId === 'profile') { window.calculateProfileRank(); window.updateUI(); }
-  if(screenId === 'home') window.checkDailyReward();
+  if(screenId === 'worlds') renderWorldsGrid();
+  if(screenId === 'leaderboard') renderLeaderboard();
+  if(screenId === 'admin') populateAdminDropdowns();
+  if(screenId === 'shop') renderShopItems();
+  if(screenId === 'crates') renderCrates();
+  if(screenId === 'profile') { calculateProfileRank(); updateUI(); }
+  if(screenId === 'home') checkDailyReward();
 }
 
-window.goBack = function() {
-  if (screenHistory.length > 1) { screenHistory.pop(); window.navigateTo(screenHistory.pop()); } 
-  else { window.navigateTo('home'); }
+function goBack() {
+  if (screenHistory.length > 1) { screenHistory.pop(); navigateTo(screenHistory.pop()); } 
+  else { navigateTo('home'); }
 }
 
-window.updateNavStyles = function(activeScreen) {
+function updateNavStyles(activeScreen) {
   document.querySelectorAll('#bottom-nav button').forEach(btn => { btn.classList.remove('text-brand-500'); btn.classList.add('text-gray-400'); });
   const activeBtn = document.getElementById(`nav-${activeScreen}`);
   if (activeBtn) { activeBtn.classList.remove('text-gray-400'); activeBtn.classList.add('text-brand-500'); }
@@ -76,12 +50,12 @@ window.updateNavStyles = function(activeScreen) {
   else { document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById('top-bar').classList.remove('hidden'); }
 }
 
-window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); }
-window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
-window.openAuthModal = function() { window.openModal('modal-auth'); }
-window.openRedeemModal = function() { window.openModal('modal-redeem'); }
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openAuthModal() { openModal('modal-auth'); }
+function openRedeemModal() { openModal('modal-redeem'); }
 
-window.showToast = function(msg, icon = '✨', type = 'info') {
+function showToast(msg, icon = '✨', type = 'info') {
   const toast = document.getElementById('toast-msg');
   document.getElementById('toast-text').innerText = msg; document.getElementById('toast-icon').innerText = icon;
   toast.className = 'bg-gray-900/95 text-white border px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 pointer-events-auto z-[100]';
@@ -91,7 +65,7 @@ window.showToast = function(msg, icon = '✨', type = 'info') {
 }
 
 let audioCtx = null;
-window.playSFX = function(type) {
+function playSFX(type) {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -113,8 +87,9 @@ window.playSFX = function(type) {
   } catch (e) {}
 }
 
-window.resetPlayerData = () => { player = JSON.parse(JSON.stringify(defaultPlayer)); window.updateUI(); };
-window.loadPlayerData = async (user) => {
+function resetPlayerData() { player = JSON.parse(JSON.stringify(defaultPlayer)); updateUI(); }
+
+async function loadPlayerData(user) {
   try {
     const userRef = window.doc(window.firebaseDb, window.DB_PATH + 'users', user.uid);
     const snap = await window.getDoc(userRef);
@@ -132,38 +107,38 @@ window.loadPlayerData = async (user) => {
        await window.setDoc(userRef, player);
     }
     player.isOwner = (user.email === OWNER_EMAIL);
-    window.updateUI(); 
-  } catch (error) { window.showToast("خطأ في جلب البيانات", "❌", "error"); }
-};
+    updateUI(); 
+  } catch (error) { showToast("خطأ في جلب البيانات", "❌", "error"); }
+}
 
-window.setupRealtimeListeners = () => {
+function setupRealtimeListeners() {
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'worlds'), (snap) => {
     dbWorlds = snap.docs.map(d => d.data()).sort((a,b)=>a.start - b.start);
     document.getElementById('home-worlds-count').innerText = `${dbWorlds.length} عوالم ساحرة`;
     document.getElementById('worlds-total-badge').innerText = `${dbWorlds.length} عالم`;
-    if(screenHistory[screenHistory.length-1] === 'worlds') window.renderWorldsGrid();
-    window.populateAdminDropdowns();
+    if(screenHistory[screenHistory.length-1] === 'worlds') renderWorldsGrid();
+    populateAdminDropdowns();
   });
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'levels'), (snap) => {
     dbLevels = snap.docs.map(d => d.data()).sort((a,b)=>a.num - b.num);
   });
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'shop'), (snap) => {
     dbShopItems = snap.docs.map(d => d.data());
-    if(screenHistory[screenHistory.length-1] === 'shop') window.renderShopItems();
+    if(screenHistory[screenHistory.length-1] === 'shop') renderShopItems();
   });
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'crates'), (snap) => {
     dbCrates = snap.docs.map(d => d.data());
-    if(screenHistory[screenHistory.length-1] === 'crates') window.renderCrates();
-    if(screenHistory[screenHistory.length-1] === 'admin') window.renderAdminCrates();
+    if(screenHistory[screenHistory.length-1] === 'crates') renderCrates();
+    if(screenHistory[screenHistory.length-1] === 'admin') renderAdminCrates();
   });
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'codes'), (snap) => {
     dbCodes = snap.docs.map(d => d.data());
-    if(screenHistory[screenHistory.length-1] === 'admin') window.renderAdminCodes();
+    if(screenHistory[screenHistory.length-1] === 'admin') renderAdminCodes();
   });
   window.onSnapshot(window.collection(window.firebaseDb, window.DB_PATH + 'users'), (snap) => {
     allUsers = snap.docs.map(d => d.data());
-    if(screenHistory[screenHistory.length-1] === 'leaderboard') window.renderLeaderboard();
-    if(screenHistory[screenHistory.length-1] === 'profile') window.calculateProfileRank();
+    if(screenHistory[screenHistory.length-1] === 'leaderboard') renderLeaderboard();
+    if(screenHistory[screenHistory.length-1] === 'profile') calculateProfileRank();
   });
   if (player.uid) {
      window.onSnapshot(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), (docSnap) => {
@@ -176,13 +151,13 @@ window.setupRealtimeListeners = () => {
            player.banners = data.banners || ['بدون بنر']; player.equippedBanner = data.equippedBanner || 'بدون بنر';
            player.badges = data.badges || [];
            player.lastDaily = data.lastDaily || '';
-           window.updateUI();
+           updateUI();
         }
      });
   }
-};
+}
 
-window.updateUIForAuth = () => {
+function updateUIForAuth() {
   const container = document.getElementById('auth-buttons-container');
   const emailText = document.getElementById('profile-email-text');
   const adminBtn = document.getElementById('owner-admin-btn-container');
@@ -193,13 +168,13 @@ window.updateUIForAuth = () => {
     emailText.innerText = 'زائر';
     container.innerHTML = `<button onclick="openAuthModal()" class="w-full btn-3d-orange py-2 rounded-xl text-xs font-black">تسجيل الدخول لحفظ تقدمك</button>`;
   }
-  if (window.isOwner()) { adminBtn.classList.remove('hidden'); document.getElementById('header-owner-badge').classList.remove('hidden'); }
+  if (isOwner()) { adminBtn.classList.remove('hidden'); document.getElementById('header-owner-badge').classList.remove('hidden'); }
   else { adminBtn.classList.add('hidden'); document.getElementById('header-owner-badge').classList.add('hidden'); }
-};
+}
 
-window.updateUI = function() {
-  document.getElementById('currency-shards').innerText = window.getDisplayShards(); 
-  document.getElementById('currency-gems').innerText = window.getDisplayGems();
+function updateUI() {
+  document.getElementById('currency-shards').innerText = getDisplayShards(); 
+  document.getElementById('currency-gems').innerText = getDisplayGems();
   document.getElementById('header-name').innerText = player.name; document.getElementById('header-title').innerText = player.equippedTitle;
   document.getElementById('header-avatar').src = player.equippedAvatar;
   document.getElementById('header-frame-wrap').className = `relative rounded-full ${getFrameClass(player.equippedFrame)}`;
@@ -242,14 +217,14 @@ window.updateUI = function() {
   const bannerSelect = document.getElementById('equip-banner-select'); bannerSelect.innerHTML = '';
   player.banners.forEach((b, i) => { bannerSelect.innerHTML += `<option value="${b}" ${player.equippedBanner === b ? 'selected' : ''}>${b === 'بدون بنر' ? 'بدون بنر' : 'بنر ' + i}</option>`; });
 
-  window.checkDailyReward();
+  checkDailyReward();
 }
 
-window.savePlayer = async function() {
-  if(!player.uid) return; // عشان الزائر بدون حساب ما يعلق النظام
+async function savePlayer() {
+  if(!player.uid) return; 
   try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { 
       name: player.name, currentLevel: player.currentLevel, 
-      shards: window.isOwner() ? 0 : player.shards, gems: window.isOwner() ? 0 : player.gems, 
+      shards: isOwner() ? 0 : player.shards, gems: isOwner() ? 0 : player.gems, 
       equippedTitle: player.equippedTitle, titles: player.titles, 
       avatars: player.avatars, equippedAvatar: player.equippedAvatar, 
       frames: player.frames, equippedFrame: player.equippedFrame, 
@@ -258,65 +233,69 @@ window.savePlayer = async function() {
   }); } catch(e) {}
 }
 
-window.handleEmailLogin = async function() {
+async function handleEmailLogin() {
   const email = document.getElementById('auth-email-input').value, pass = document.getElementById('auth-pass-input').value;
-  if(!email || !pass) return window.showToast("أدخل البيانات", "⚠️", "error");
-  try { await window.signInWithEmailAndPassword(window.firebaseAuth, email, pass); window.closeModal('modal-auth'); window.showToast("مرحباً بك", "✅", "success"); } 
+  if(!email || !pass) return showToast("أدخل البيانات", "⚠️", "error");
+  try { await window.signInWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("مرحباً بك", "✅", "success"); } 
   catch (e) {
      if(e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
-         try { await window.createUserWithEmailAndPassword(window.firebaseAuth, email, pass); window.closeModal('modal-auth'); window.showToast("تم إنشاء الحساب", "✅", "success"); } catch(err) { window.showToast("خطأ", "❌", "error"); }
-     } else window.showToast("خطأ بالبيانات", "❌", "error");
+         try { await window.createUserWithEmailAndPassword(window.firebaseAuth, email, pass); closeModal('modal-auth'); showToast("تم إنشاء الحساب", "✅", "success"); } catch(err) { showToast("خطأ", "❌", "error"); }
+     } else showToast("خطأ بالبيانات", "❌", "error");
   }
 }
-window.handleGoogleLogin = async function() {
-   try { const provider = new window.GoogleAuthProvider(); await window.signInWithPopup(window.firebaseAuth, provider); window.closeModal('modal-auth'); window.showToast("مرحباً بك", "✅", "success"); } catch(e) { window.showToast("فشل", "❌", "error"); }
-}
-window.handleAnonymousLogin = async function() { try { await window.signInAnonymously(window.firebaseAuth); window.closeModal('modal-auth'); window.showToast("دخلت كزائر", "✅", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); } }
-window.handleLogout = async function() { try { await window.signOut(window.firebaseAuth); window.showToast("وداعاً", "👋", "success"); } catch(e) {} }
 
-window.checkDailyReward = function() {
+async function handleGoogleLogin() {
+   try { const provider = new window.GoogleAuthProvider(); await window.signInWithPopup(window.firebaseAuth, provider); closeModal('modal-auth'); showToast("مرحباً بك", "✅", "success"); } catch(e) { showToast("فشل", "❌", "error"); }
+}
+
+async function handleAnonymousLogin() { 
+    try { await window.signInAnonymously(window.firebaseAuth); closeModal('modal-auth'); showToast("دخلت كزائر", "✅", "success"); } catch(e) { showToast("خطأ", "❌", "error"); } 
+}
+
+async function handleLogout() { 
+    try { await window.signOut(window.firebaseAuth); showToast("وداعاً", "👋", "success"); } catch(e) {} 
+}
+
+function checkDailyReward() {
    if(screenHistory[screenHistory.length-1] !== 'home') return;
    const today = new Date().toDateString();
    const banner = document.getElementById('daily-reward-banner');
-   // الآن بتظهر حتى للزائر عشان يكسب عملات
    if(player.lastDaily !== today) banner.classList.remove('hidden');
    else banner.classList.add('hidden');
 }
 
-// 🔧 إصلاح المكافأة اليومية نهائياً
-window.claimDailyReward = async function() {
+async function claimDailyReward() {
    const today = new Date().toDateString();
-   if(player.lastDaily === today) return window.showToast("لقد استلمت مكافأتك اليوم بالفعل!", "⚠️", "error");
+   if(player.lastDaily === today) return showToast("لقد استلمت مكافأتك اليوم بالفعل!", "⚠️", "error");
    
    const isGem = Math.random() > 0.8; 
    const amount = isGem ? (Math.floor(Math.random() * 6) + 5) : (Math.floor(Math.random() * 21) + 10);
    if(isGem) player.gems += amount; else player.shards += amount;
    player.lastDaily = today;
    
-   await window.savePlayer();
-   window.updateUI();
+   await savePlayer();
+   updateUI();
 
    document.getElementById('daily-reward-banner').classList.add('hidden');
-   window.playSFX('win');
-   window.showToast(`استلمت مكافأة يومية: ${amount} ${isGem ? '💎' : '🧩'}`, "🎉", "success");
+   playSFX('win');
+   showToast(`استلمت مكافأة يومية: ${amount} ${isGem ? '💎' : '🧩'}`, "🎉", "success");
    
    if(typeof confetti === "function") {
        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
    }
 }
 
-// 🔧 تنبيه يظهر إذا الأسئلة مش موجودة بقاعدة البيانات
-window.playCurrentLevel = function() {
+function playCurrentLevel() {
   if(!dbLevels || dbLevels.length === 0) {
-      window.playSFX('wrong');
-      return window.showToast("الأسئلة غير موجودة! يجب الدخول للوحة المالك وتوليد المراحل أولاً.", "⚠️", "error");
+      playSFX('wrong');
+      return showToast("الأسئلة غير موجودة! يجب الدخول للوحة المالك وتوليد المراحل أولاً.", "⚠️", "error");
   }
   const lvl = dbLevels.find(l => l.num == player.currentLevel);
-  if(!lvl) return window.showToast("أنت أسطورة! أنهيت كل المراحل الحالية.", "🚀", "info");
-  window.loadLevel(lvl); window.navigateTo('game');
+  if(!lvl) return showToast("أنت أسطورة! أنهيت كل المراحل الحالية.", "🚀", "info");
+  loadLevel(lvl); navigateTo('game');
 }
 
-window.renderWorldsGrid = function() {
+function renderWorldsGrid() {
    const grid = document.getElementById('worlds-grid'); grid.innerHTML = '';
    if(dbWorlds.length === 0) {
        return grid.innerHTML = '<div class="text-center text-gray-400 text-xs py-8 border border-red-500/30 rounded-2xl bg-black/50">لا توجد عوالم! يرجى توليدها من لوحة الإدارة 👑</div>';
@@ -328,9 +307,9 @@ window.renderWorldsGrid = function() {
    });
 }
 
-window.openWorldLevels = function(worldId) {
+function openWorldLevels(worldId) {
    const w = dbWorlds.find(x => x.id === worldId); if(!w) return;
-   if(player.currentLevel < w.start) { window.playSFX('wrong'); return window.showToast("هذا العالم مغلق بعد!", "🔒", "error"); }
+   if(player.currentLevel < w.start) { playSFX('wrong'); return showToast("هذا العالم مغلق بعد!", "🔒", "error"); }
    document.getElementById('levels-world-title').innerHTML = `${w.name} ${w.icon}`;
    const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
    const wLevels = dbLevels.filter(l => l.world === worldId).sort((a,b)=>a.num - b.num);
@@ -339,12 +318,12 @@ window.openWorldLevels = function(worldId) {
       let btnClass = "bg-black/60 border-gray-800 text-gray-500 cursor-not-allowed";
       if(isPassed) btnClass = "bg-green-900/30 border-green-500/40 text-green-400"; else if(isUnlocked) btnClass = "btn-3d-orange text-white";
       grid.innerHTML += `<button ${isUnlocked ? `onclick="playSpecificLevel(${l.num})"` : ''} class="${btnClass} h-12 rounded-2xl font-black flex items-center justify-center border text-sm transition">${isUnlocked ? l.num : '<i class="fa-solid fa-lock text-xs"></i>'}</button>`;
-   }); window.navigateTo('levels');
+   }); navigateTo('levels');
 }
 
-window.playSpecificLevel = function(num) { const lvl = dbLevels.find(l => l.num == num); if(lvl) { window.loadLevel(lvl); window.navigateTo('game'); } }
+function playSpecificLevel(num) { const lvl = dbLevels.find(l => l.num == num); if(lvl) { loadLevel(lvl); navigateTo('game'); } }
 
-window.loadLevel = function(lvl) {
+function loadLevel(lvl) {
   currentLevelObj = lvl; 
   document.getElementById('game-level-num').innerText = `مرحلة ${lvl.num}`; 
   document.getElementById('game-question-text').innerText = lvl.q;
@@ -363,37 +342,37 @@ window.loadLevel = function(lvl) {
   const arabicLetters = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'; availableLetters = lvl.a.split('');
   while(availableLetters.length < 14) availableLetters.push(arabicLetters[Math.floor(Math.random() * arabicLetters.length)]);
   availableLetters = availableLetters.sort(() => Math.random() - 0.5).map((char, index) => ({ id: index, char: char, used: false }));
-  window.renderGameUI();
+  renderGameUI();
 }
 
-window.useHintReveal = function() {
-  if(player.shards < 15 && !window.isOwner()) { window.playSFX('wrong'); return window.showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
+function useHintReveal() {
+  if(player.shards < 15 && !isOwner()) { playSFX('wrong'); return showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
   const emptyIndex = currentSlots.findIndex(s => s === null);
   if(emptyIndex === -1) return;
   const correctChar = currentLevelObj.a[emptyIndex];
   const targetLetter = availableLetters.find(l => !l.used && l.char === correctChar);
   if(targetLetter) {
-     if(!window.isOwner()) player.shards -= 15; window.savePlayer(); window.updateUI();
-     targetLetter.used = true; currentSlots[emptyIndex] = targetLetter; window.renderGameUI();
+     if(!isOwner()) player.shards -= 15; savePlayer(); updateUI();
+     targetLetter.used = true; currentSlots[emptyIndex] = targetLetter; renderGameUI();
   }
 }
-window.useHintRemoveWrong = function() {
-   if(player.shards < 10 && !window.isOwner()) { window.playSFX('wrong'); return window.showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
+function useHintRemoveWrong() {
+   if(player.shards < 10 && !isOwner()) { playSFX('wrong'); return showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
    const wrongLetters = availableLetters.filter(l => !l.used && !currentLevelObj.a.includes(l.char));
    if(wrongLetters.length > 0) {
-      if(!window.isOwner()) player.shards -= 10; window.savePlayer(); window.updateUI();
-      wrongLetters[0].used = true; window.renderGameUI();
-   } else window.showToast("لا يوجد حروف خاطئة زائدة!", "💡", "info");
+      if(!isOwner()) player.shards -= 10; savePlayer(); updateUI();
+      wrongLetters[0].used = true; renderGameUI();
+   } else showToast("لا يوجد حروف خاطئة زائدة!", "💡", "info");
 }
-window.useHintSkip = function() {
-   if(player.shards < 30 && !window.isOwner()) { window.playSFX('wrong'); return window.showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
-   if(!window.isOwner()) player.shards -= 30; window.savePlayer(); window.updateUI();
+function useHintSkip() {
+   if(player.shards < 30 && !isOwner()) { playSFX('wrong'); return showToast("رصيد الشظايا غير كافِ", "⚠️", "error"); }
+   if(!isOwner()) player.shards -= 30; savePlayer(); updateUI();
    document.getElementById('win-reward-text').innerText = `تم تخطي المرحلة!`;
-   window.playSFX('win');
-   window.openModal('modal-win');
+   playSFX('win');
+   openModal('modal-win');
 }
 
-window.renderGameUI = function() {
+function renderGameUI() {
   const slotsContainer = document.getElementById('answer-slots-container'); slotsContainer.innerHTML = '';
   currentSlots.forEach((slot, index) => { slotsContainer.innerHTML += `<div onclick="removeLetterFromSlot(${index})" class="letter-slot shadow-inner">${slot ? slot.char : ''}</div>`; });
   const poolContainer = document.getElementById('letters-pool-container'); poolContainer.innerHTML = '';
@@ -402,41 +381,41 @@ window.renderGameUI = function() {
   const isFull = currentSlots.every(s => s !== null);
   const currentWord = currentSlots.map(s => s ? s.char : '').join('');
   if (isFull && currentWord !== currentLevelObj.a) {
-      window.playSFX('wrong');
+      playSFX('wrong');
   }
 
-  window.checkWin();
+  checkWin();
 }
 
-window.addLetterToSlot = function(letterId) {
-  window.playSFX('click'); const emptyIndex = currentSlots.findIndex(s => s === null);
-  if (emptyIndex !== -1) { const l = availableLetters.find(x => x.id === letterId); if(l && !l.used) { l.used = true; currentSlots[emptyIndex] = l; window.renderGameUI(); } }
+function addLetterToSlot(letterId) {
+  playSFX('click'); const emptyIndex = currentSlots.findIndex(s => s === null);
+  if (emptyIndex !== -1) { const l = availableLetters.find(x => x.id === letterId); if(l && !l.used) { l.used = true; currentSlots[emptyIndex] = l; renderGameUI(); } }
 }
-window.removeLetterFromSlot = function(slotIndex) { const slot = currentSlots[slotIndex]; if (slot) { window.playSFX('click'); const l = availableLetters.find(x => x.id === slot.id); if(l) l.used = false; currentSlots[slotIndex] = null; window.renderGameUI(); } }
-window.removeLastLetter = function() { for(let i=currentSlots.length-1; i>=0; i--){ if(currentSlots[i] !== null) { window.removeLetterFromSlot(i); break; } } }
-window.shuffleLetters = function() { window.playSFX('click'); availableLetters.sort(() => Math.random() - 0.5); window.renderGameUI(); }
+function removeLetterFromSlot(slotIndex) { const slot = currentSlots[slotIndex]; if (slot) { playSFX('click'); const l = availableLetters.find(x => x.id === slot.id); if(l) l.used = false; currentSlots[slotIndex] = null; renderGameUI(); } }
+function removeLastLetter() { for(let i=currentSlots.length-1; i>=0; i--){ if(currentSlots[i] !== null) { removeLetterFromSlot(i); break; } } }
+function shuffleLetters() { playSFX('click'); availableLetters.sort(() => Math.random() - 0.5); renderGameUI(); }
 
-window.checkWin = function() {
+function checkWin() {
   const currentWord = currentSlots.map(s => s ? s.char : '').join('');
   if (currentWord === currentLevelObj.a) {
-    window.playSFX('win'); 
+    playSFX('win'); 
     if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     document.getElementById('win-reward-text').innerText = `حصلت على +${currentLevelObj.shards} شظية 🧩`;
-    setTimeout(() => { window.openModal('modal-win'); }, 500);
+    setTimeout(() => { openModal('modal-win'); }, 500);
   }
 }
 
-window.nextLevelFromWinModal = async function() {
-  window.closeModal('modal-win');
+async function nextLevelFromWinModal() {
+  closeModal('modal-win');
   if (player.currentLevel === currentLevelObj.num) {
-     if(!window.isOwner()) player.shards += currentLevelObj.shards;
-     player.currentLevel += 1; await window.savePlayer();
+     if(!isOwner()) player.shards += currentLevelObj.shards;
+     player.currentLevel += 1; await savePlayer();
      
      const currentWorld = dbWorlds.find(w => w.id === currentLevelObj.world);
      if(currentWorld && currentWorld.end == currentLevelObj.num) {
         let gotTop10 = false;
         
-        if(!window.isOwner()) { 
+        if(!isOwner()) { 
            player.gems += 100; player.shards += 500;
            if(currentWorld.rewardTitle && !player.titles.includes(currentWorld.rewardTitle)) {
                player.titles.push(currentWorld.rewardTitle);
@@ -453,19 +432,19 @@ window.nextLevelFromWinModal = async function() {
               await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', currentWorld.id), { finishersCount: finishers + 1 });
            }
         }
-        await window.savePlayer();
+        await savePlayer();
         document.getElementById('world-complete-title-reward').innerText = currentWorld.rewardTitle ? `+ لقب الإتمام: ${currentWorld.rewardTitle}` : '';
         document.getElementById('world-complete-top10').innerText = gotTop10 ? `🎉 مبروك! أنت من أول 10 أساطير أنهوا العالم! جائزتك: ${currentWorld.top10Reward}` : '';
-        window.openModal('modal-world-complete'); 
-        window.playSFX('win');
+        openModal('modal-world-complete'); 
+        playSFX('win');
         return;
      }
   }
-  window.playCurrentLevel();
+  playCurrentLevel();
 }
-window.closeWorldCompleteAndGoNext = function() { window.closeModal('modal-world-complete'); window.playCurrentLevel(); }
+function closeWorldCompleteAndGoNext() { closeModal('modal-world-complete'); playCurrentLevel(); }
 
-window.renderCrates = function() {
+function renderCrates() {
     const grid = document.getElementById('crates-grid'); if(!grid) return; grid.innerHTML = '';
     if(!dbCrates || dbCrates.length === 0) return grid.innerHTML = '<div class="text-center text-gray-400 text-xs py-8">لا توجد بكجات حالياً.</div>';
     
@@ -482,20 +461,20 @@ window.renderCrates = function() {
     });
 }
 
-window.openCrate = async function(crateId) {
+async function openCrate(crateId) {
     const crate = dbCrates.find(c => c.id === crateId);
     if (!crate) return;
 
-    if (!window.isOwner() && player[crate.currency] < crate.price) {
-        window.playSFX('wrong');
-        return window.showToast("لا تملك عملات كافية لفتح الصندوق!", "⚠️", "error");
+    if (!isOwner() && player[crate.currency] < crate.price) {
+        playSFX('wrong');
+        return showToast("لا تملك عملات كافية لفتح الصندوق!", "⚠️", "error");
     }
 
-    if (!window.isOwner()) player[crate.currency] -= crate.price;
-    await window.savePlayer(); window.updateUI();
+    if (!isOwner()) player[crate.currency] -= crate.price;
+    await savePlayer(); updateUI();
 
-    window.playSFX('crate_open');
-    window.openModal('modal-crate-open');
+    playSFX('crate_open');
+    openModal('modal-crate-open');
     document.getElementById('crate-shake-icon').innerText = crate.icon;
     document.getElementById('crate-shake-icon').classList.add('animate-shake-crate');
     document.getElementById('crate-result-text').classList.add('hidden');
@@ -526,7 +505,7 @@ window.openCrate = async function(crateId) {
             msg = `إطار جديد: ${wonItem.value} 🖼️`; 
         }
 
-        await window.savePlayer(); window.updateUI();
+        await savePlayer(); updateUI();
         
         document.getElementById('crate-shake-icon').classList.remove('animate-shake-crate');
         document.getElementById('crate-shake-icon').innerText = '🎉';
@@ -539,7 +518,7 @@ window.openCrate = async function(crateId) {
     }, 1500);
 }
 
-window.renderShopItems = function() {
+function renderShopItems() {
    const grid = document.getElementById('shop-items-grid'); if(!grid) return; grid.innerHTML = '';
    if(!dbShopItems || dbShopItems.length === 0) return grid.innerHTML = '<div class="col-span-2 text-center text-gray-400 text-xs py-8">المتجر فارغ حالياً.</div>';
    dbShopItems.forEach(item => {
@@ -571,18 +550,18 @@ window.renderShopItems = function() {
    });
 }
 
-window.buyShopItem = async function(id, currency, cost) {
+async function buyShopItem(id, currency, cost) {
    const item = dbShopItems.find(x => x.id === id); if(!item) return;
-   if(!window.isOwner() && player[currency] < cost) { window.playSFX('wrong'); return window.showToast(`الرصيد غير كافِ`, "⚠️", "error"); }
-   if(!window.isOwner()) player[currency] -= cost; 
+   if(!isOwner() && player[currency] < cost) { playSFX('wrong'); return showToast(`الرصيد غير كافِ`, "⚠️", "error"); }
+   if(!isOwner()) player[currency] -= cost; 
    if(item.type === 'title') player.titles.push(item.name);
    else if(item.type === 'avatar') player.avatars.push(item.name);
    else if(item.type === 'frame') player.frames.push(item.name);
    else if(item.type === 'banner') player.banners.push(item.name);
-   await window.savePlayer(); window.renderShopItems(); window.showToast(`تم الشراء بنجاح`, "🎉", "success");
+   await savePlayer(); renderShopItems(); showToast(`تم الشراء بنجاح`, "🎉", "success");
 }
 
-window.calculateProfileRank = function() {
+function calculateProfileRank() {
     if(!player.uid) return;
     const sorted = [...allUsers].sort((a,b) => { if(b.currentLevel === a.currentLevel) return b.shards - a.shards; return b.currentLevel - a.currentLevel; });
     const rankIndex = sorted.findIndex(u => u.uid === player.uid);
@@ -590,7 +569,7 @@ window.calculateProfileRank = function() {
     if(rankIndex !== -1) { rankSpan.innerText = `#${rankIndex + 1}`; rankSpan.classList.add(rankIndex < 3 ? 'text-yellow-400' : 'text-amber-400'); } else { rankSpan.innerText = '-'; }
 }
 
-window.renderLeaderboard = function() {
+function renderLeaderboard() {
    const sorted = [...allUsers].sort((a,b) => { if(b.currentLevel === a.currentLevel) return b.shards - a.shards; return b.currentLevel - a.currentLevel; }).slice(0, 50);
    const top3 = document.getElementById('leaderboard-top-3'); top3.innerHTML = '';
    if(sorted.length >= 2) top3.innerHTML += buildTopCard(sorted[1], '🥈', 'cyan');
@@ -610,7 +589,7 @@ function buildTopCard(u, icon, color, isFirst=false) {
 }
 
 let viewedUser = null;
-window.openPublicProfile = function(uid) {
+function openPublicProfile(uid) {
    viewedUser = allUsers.find(u => u.uid === uid); if(!viewedUser) return;
    document.getElementById('pub-avatar-img').src = viewedUser.equippedAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${viewedUser.name}`;
    document.getElementById('pub-name-text').innerText = viewedUser.name;
@@ -634,26 +613,26 @@ window.openPublicProfile = function(uid) {
    }
 
    if(viewedUser.email === OWNER_EMAIL) { document.getElementById('pub-owner-badge').classList.remove('hidden'); document.getElementById('pub-name-text').classList.add('text-amber-400'); } else { document.getElementById('pub-owner-badge').classList.add('hidden'); document.getElementById('pub-name-text').classList.remove('text-amber-400'); }
-   if(window.isOwner() && viewedUser.email !== OWNER_EMAIL) document.getElementById('pub-admin-actions').classList.remove('hidden'); else document.getElementById('pub-admin-actions').classList.add('hidden');
-   window.navigateTo('public-profile');
+   if(isOwner() && viewedUser.email !== OWNER_EMAIL) document.getElementById('pub-admin-actions').classList.remove('hidden'); else document.getElementById('pub-admin-actions').classList.add('hidden');
+   navigateTo('public-profile');
 }
 
-window.changeEquippedTitle = async function(title) { player.equippedTitle = title; await window.savePlayer(); window.updateUI(); window.showToast("تم تغيير اللقب", "✅", "success"); }
-window.changeEquippedAvatar = async function(avatarUrl) { player.equippedAvatar = avatarUrl; await window.savePlayer(); window.updateUI(); window.showToast("تم تغيير الصورة", "✅", "success"); }
-window.changeEquippedFrame = async function(frame) { player.equippedFrame = frame; await window.savePlayer(); window.updateUI(); window.showToast("تم تغيير الإطار", "✅", "success"); }
-window.changeEquippedBanner = async function(banner) { player.equippedBanner = banner; await window.savePlayer(); window.updateUI(); window.showToast("تم تغيير البنر", "✅", "success"); }
-window.editProfileName = async function() { const newName = prompt("أدخل اسمك الجديد:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await window.savePlayer(); window.updateUI(); window.showToast("تم التحديث", "✅", "success"); } }
+async function changeEquippedTitle(title) { player.equippedTitle = title; await savePlayer(); updateUI(); showToast("تم تغيير اللقب", "✅", "success"); }
+async function changeEquippedAvatar(avatarUrl) { player.equippedAvatar = avatarUrl; await savePlayer(); updateUI(); showToast("تم تغيير الصورة", "✅", "success"); }
+async function changeEquippedFrame(frame) { player.equippedFrame = frame; await savePlayer(); updateUI(); showToast("تم تغيير الإطار", "✅", "success"); }
+async function changeEquippedBanner(banner) { player.equippedBanner = banner; await savePlayer(); updateUI(); showToast("تم تغيير البنر", "✅", "success"); }
+async function editProfileName() { const newName = prompt("أدخل اسمك الجديد:", player.name); if(newName && newName.trim().length > 2) { player.name = newName.trim(); await savePlayer(); updateUI(); showToast("تم التحديث", "✅", "success"); } }
 
-window.editProfileAvatarCustom = async function() {
+async function editProfileAvatarCustom() {
    const newUrl = prompt("أدخل رابط الصورة (URL) من الإنترنت لتكون صورتك الشخصية:", player.equippedAvatar);
    if(newUrl && newUrl.trim().length > 5) {
       player.equippedAvatar = newUrl.trim();
       if(!player.avatars.includes(newUrl.trim())) player.avatars.push(newUrl.trim());
-      await window.savePlayer(); window.updateUI(); window.showToast("تم تحديث صورتك الشخصية!", "📸", "success");
+      await savePlayer(); updateUI(); showToast("تم تحديث صورتك الشخصية!", "📸", "success");
    }
 }
 
-window.searchPlayersGlobal = function() {
+function searchPlayersGlobal() {
    const q = document.getElementById('global-search-input').value.trim().toLowerCase();
    const resDiv = document.getElementById('global-search-results');
    const list = document.getElementById('leaderboard-list');
@@ -672,14 +651,14 @@ window.searchPlayersGlobal = function() {
    });
 }
 
-window.claimPromoCode = async function() {
+async function claimPromoCode() {
    const codeInput = document.getElementById('redeem-code-input').value.trim().toUpperCase();
-   if(!codeInput) return window.showToast("أدخل الكود", "⚠️", "error"); if(!player.uid) return window.showToast("يجب تسجيل الدخول", "🔒", "error");
+   if(!codeInput) return showToast("أدخل الكود", "⚠️", "error"); if(!player.uid) return showToast("يجب تسجيل الدخول", "🔒", "error");
    try {
       const codeRef = window.doc(window.firebaseDb, window.DB_PATH + 'codes', codeInput); const snap = await window.getDoc(codeRef);
-      if(!snap.exists() || !snap.data().active) return window.showToast("كود غير صالح أو منتهي", "❌", "error");
+      if(!snap.exists() || !snap.data().active) return showToast("كود غير صالح أو منتهي", "❌", "error");
       const claimedRef = window.doc(window.firebaseDb, window.DB_PATH + `users/${player.uid}/claimedCodes`, codeInput);
-      if((await window.getDoc(claimedRef)).exists()) return window.showToast("استخدمت الكود مسبقاً", "⚠️", "error");
+      if((await window.getDoc(claimedRef)).exists()) return showToast("استخدمت الكود مسبقاً", "⚠️", "error");
       
       const data = snap.data(); let msg = "حصلت على: ";
       if(data.gems > 0) { player.gems += data.gems; msg += `${data.gems}💎 `; }
@@ -692,23 +671,23 @@ window.claimPromoCode = async function() {
          if(data.itemType === 'banner' && !player.banners.includes(data.itemValue)) { player.banners.push(data.itemValue); msg += `بنر خلفية جديد `; }
       }
       
-      await window.savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
-      window.closeModal('modal-redeem'); window.showToast(msg, "🎉", "success"); document.getElementById('redeem-code-input').value = '';
-      if(typeof confetti === 'function') confetti(); window.playSFX('win');
-   } catch(e) { window.showToast("خطأ", "❌", "error"); }
+      await savePlayer(); await window.setDoc(claimedRef, { claimedAt: new Date().toISOString() });
+      closeModal('modal-redeem'); showToast(msg, "🎉", "success"); document.getElementById('redeem-code-input').value = '';
+      if(typeof confetti === 'function') confetti(); playSFX('win');
+   } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.switchAdminTab = function(tab) {
+function switchAdminTab(tab) {
    document.querySelectorAll('[id^="admin-sec-"]').forEach(el => el.classList.add('hidden'));
    document.querySelectorAll('[id^="admintab-"]').forEach(el => el.className = el.id.includes('danger') ? "flex-1 py-2 px-1 rounded-xl text-red-400" : "flex-1 py-2 px-1 rounded-xl text-gray-400");
    document.getElementById(`admin-sec-${tab}`).classList.remove('hidden');
    const btn = document.getElementById(`admintab-${tab}`);
    if(tab === 'danger') btn.className = "flex-1 py-2 px-1 rounded-xl bg-red-600 text-white font-black"; else btn.className = "flex-1 py-2 px-1 rounded-xl bg-brand-500 text-white font-black";
-   if(tab === 'gift') window.renderAdminCodes();
-   if(tab === 'crates') window.renderAdminCrates();
+   if(tab === 'gift') renderAdminCodes();
+   if(tab === 'crates') renderAdminCrates();
 }
 
-window.populateAdminDropdowns = function() {
+function populateAdminDropdowns() {
    const sel = document.getElementById('adm-lvl-world'); sel.innerHTML = '';
    const autoSel = document.getElementById('adm-auto-lvl-world'); autoSel.innerHTML = '';
    dbWorlds.forEach(w => { 
@@ -717,7 +696,7 @@ window.populateAdminDropdowns = function() {
    });
 }
 
-window.updateShopInputPlaceholder = function() {
+function updateShopInputPlaceholder() {
    const type = document.getElementById('adm-shop-type').value;
    const input = document.getElementById('adm-shop-title');
    if(type === 'avatar') input.placeholder = "رابط الصورة (URL) من الإنترنت";
@@ -726,7 +705,7 @@ window.updateShopInputPlaceholder = function() {
    else input.placeholder = "اسم اللقب (مثال: قاهر الألغاز)";
 }
 
-window.updateCodeItemPlaceholder = function() {
+function updateCodeItemPlaceholder() {
    const type = document.getElementById('adm-code-type').value;
    const input = document.getElementById('adm-code-item');
    if(type === 'none') { input.classList.add('hidden'); }
@@ -738,9 +717,9 @@ window.updateCodeItemPlaceholder = function() {
    }
 }
 
-window.adminGenerate10Worlds = async function() {
+async function adminGenerate10Worlds() {
    if(!confirm("هل أنت متأكد من توليد العوالم العشرة الأسطورية؟")) return;
-   window.showToast("جاري التوليد... الرجاء الانتظار", "⏳", "info");
+   showToast("جاري التوليد... الرجاء الانتظار", "⏳", "info");
    const worlds = [
         { id: 'w1', name: 'غابة البداية', icon: '🌲', start: 1, end: 100, rewardTitle: 'حارس الغابة', top10Reward: 'أسطورة الطبيعة' },
         { id: 'w2', name: 'صحراء الغموض', icon: '🏜️', start: 101, end: 200, rewardTitle: 'فارس الصحراء', top10Reward: 'عقرب الرمال' },
@@ -755,16 +734,16 @@ window.adminGenerate10Worlds = async function() {
    ];
    try {
      for (let w of worlds) { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', w.id), { ...w, finishersCount: 0 }); }
-     window.showToast("تم توليد الـ 10 عوالم بنجاح!", "✅", "success");
-   } catch(e) { window.showToast("خطأ", "❌", "error"); }
+     showToast("تم توليد الـ 10 عوالم بنجاح!", "✅", "success");
+   } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminAutoGenerateLevels = async function() {
+async function adminAutoGenerateLevels() {
    const worldId = document.getElementById('adm-auto-lvl-world').value;
    const w = dbWorlds.find(x => x.id === worldId);
-   if(!w) return window.showToast("اختر عالم", "⚠️", "error");
+   if(!w) return showToast("اختر عالم", "⚠️", "error");
    if(confirm(`سيتم توليد 100 مرحلة متدرجة الصعوبة للعالم (${w.name})، متأكد؟`)) {
-      window.showToast("جاري توليد 100 مرحلة... قد يستغرق ثواني", "⏳", "info");
+      showToast("جاري توليد 100 مرحلة... قد يستغرق ثواني", "⏳", "info");
       let proms = [];
       for(let i=w.start; i<=w.end; i++){
          proms.push(window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+i), { 
@@ -774,18 +753,18 @@ window.adminAutoGenerateLevels = async function() {
              img: '' 
          }));
       }
-      try { await Promise.all(proms); window.showToast("تم التوليد بنجاح!", "✅", "success"); } catch(e) { window.showToast("حدث خطأ", "❌", "error"); }
+      try { await Promise.all(proms); showToast("تم التوليد بنجاح!", "✅", "success"); } catch(e) { showToast("حدث خطأ", "❌", "error"); }
    }
 }
 
-window.adminSaveWorld = async function() {
+async function adminSaveWorld() {
    const id = document.getElementById('adm-world-id').value.trim(), name = document.getElementById('adm-world-name').value.trim(), icon = document.getElementById('adm-world-icon').value.trim(), start = parseInt(document.getElementById('adm-world-start').value), end = parseInt(document.getElementById('adm-world-end').value);
    const rewardTitle = document.getElementById('adm-world-reward-title').value.trim(), top10Reward = document.getElementById('adm-world-top10-reward').value.trim();
-   if(!id || !name || !icon || !start || !end) return window.showToast("أكمل البيانات الأساسية", "⚠️", "error");
-   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', id), { id, name, icon, start, end, rewardTitle, top10Reward, finishersCount: 0 }); window.showToast("تم حفظ العالم", "🌍", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
+   if(!id || !name || !icon || !start || !end) return showToast("أكمل البيانات الأساسية", "⚠️", "error");
+   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', id), { id, name, icon, start, end, rewardTitle, top10Reward, finishersCount: 0 }); showToast("تم حفظ العالم", "🌍", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminSaveLevel = async function() {
+async function adminSaveLevel() {
    const num = parseInt(document.getElementById('adm-lvl-num').value), 
          world = document.getElementById('adm-lvl-world').value, 
          q = document.getElementById('adm-lvl-question').value.trim(), 
@@ -793,24 +772,24 @@ window.adminSaveLevel = async function() {
          shards = parseInt(document.getElementById('adm-lvl-shards').value),
          img = document.getElementById('adm-lvl-img').value.trim(); 
    
-   if(!num || !world || !q || !a) return window.showToast("أكمل البيانات", "⚠️", "error");
-   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+num), { num, world, q, a, shards, img }); window.showToast("تم الإضافة", "➕", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
+   if(!num || !world || !q || !a) return showToast("أكمل البيانات", "⚠️", "error");
+   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+num), { num, world, q, a, shards, img }); showToast("تم الإضافة", "➕", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminSaveShopItem = async function() {
+async function adminSaveShopItem() {
    const type = document.getElementById('adm-shop-type').value, name = document.getElementById('adm-shop-title').value.trim(), gems = parseInt(document.getElementById('adm-shop-price-gems').value) || 0, shards = parseInt(document.getElementById('adm-shop-price-shards').value) || 0;
-   if(!name) return window.showToast("أدخل الاسم أو الرابط", "⚠️", "error");
+   if(!name) return showToast("أدخل الاسم أو الرابط", "⚠️", "error");
    const id = type + '_' + Date.now();
-   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'shop', id), { id, type, name, gems, shards }); window.showToast("أضيف للمتجر", "✅", "success"); document.getElementById('adm-shop-title').value = ''; } catch(e) { window.showToast("خطأ", "❌", "error"); }
+   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'shop', id), { id, type, name, gems, shards }); showToast("أضيف للمتجر", "✅", "success"); document.getElementById('adm-shop-title').value = ''; } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminSaveCrate = async function() {
+async function adminSaveCrate() {
     const name = document.getElementById('adm-crate-name').value.trim();
     const icon = document.getElementById('adm-crate-icon').value.trim() || '📦';
     const price = parseInt(document.getElementById('adm-crate-price').value);
     const currency = document.getElementById('adm-crate-currency').value;
     
-    if(!name || !price) return window.showToast("ادخل اسم البكج والسعر", "⚠️", "error");
+    if(!name || !price) return showToast("ادخل اسم البكج والسعر", "⚠️", "error");
     
     const drops = [];
     for(let i=1; i<=3; i++) {
@@ -827,16 +806,16 @@ window.adminSaveCrate = async function() {
         }
     }
     
-    if(drops.length === 0) return window.showToast("اضف جائزة واحدة على الأقل", "⚠️", "error");
+    if(drops.length === 0) return showToast("اضف جائزة واحدة على الأقل", "⚠️", "error");
     
     const id = 'crate_' + Date.now();
     try { 
         await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'crates', id), { id, name, icon, price, currency, drops }); 
-        window.showToast("تم إنشاء البكج بنجاح", "📦", "success"); 
-    } catch(e) { window.showToast("خطأ", "❌", "error"); }
+        showToast("تم إنشاء البكج بنجاح", "📦", "success"); 
+    } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.renderAdminCrates = function() {
+function renderAdminCrates() {
     const list = document.getElementById('adm-crates-list'); if(!list) return; list.innerHTML = '';
     if(dbCrates.length === 0) return list.innerHTML = '<p class="text-xs text-center text-gray-500 py-2">لا توجد بكجات</p>';
     dbCrates.forEach(c => {
@@ -844,28 +823,28 @@ window.renderAdminCrates = function() {
     });
 }
 
-window.adminDeleteCrate = async function(id) {
+async function adminDeleteCrate(id) {
     if(!confirm('حذف هذا البكج نهائياً؟')) return;
-    try { await window.deleteDoc(window.doc(window.firebaseDb, window.DB_PATH + 'crates', id)); window.showToast("تم الحذف", "🗑️", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
+    try { await window.deleteDoc(window.doc(window.firebaseDb, window.DB_PATH + 'crates', id)); showToast("تم الحذف", "🗑️", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminSearchUsers = function() {
+function adminSearchUsers() {
    const q = document.getElementById('adm-search-input').value.trim().toLowerCase(), resDiv = document.getElementById('adm-search-results'); resDiv.innerHTML = '';
    if(!q) return; const filtered = allUsers.filter(u => u.name.toLowerCase().includes(q));
    if(filtered.length === 0) return resDiv.innerHTML = '<p class="text-xs text-center text-gray-500 py-4">لم يتم العثور</p>';
    filtered.forEach(u => resDiv.innerHTML += `<div class="bg-black/40 border border-white/10 p-3 rounded-xl flex items-center justify-between"><div><h4 class="text-xs font-black text-white">${u.name}</h4><span class="text-[10px] text-gray-400">مرحلة: ${u.currentLevel} | 🧩 ${u.shards}</span></div><button onclick="openPublicProfile('${u.uid}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">ملف/إهداء</button></div>`);
 }
 
-window.adminCreateCode = async function() {
+async function adminCreateCode() {
    const code = document.getElementById('adm-code-name').value.trim().toUpperCase(), gems = parseInt(document.getElementById('adm-code-gems').value) || 0, shards = parseInt(document.getElementById('adm-code-shards').value) || 0;
    const itemType = document.getElementById('adm-code-type').value;
    const itemValue = document.getElementById('adm-code-item').value.trim();
-   if(!code) return window.showToast("أدخل الرمز", "⚠️", "error");
-   if(itemType !== 'none' && !itemValue) return window.showToast("أدخل اسم الهدية أو الرابط", "⚠️", "error");
-   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { code, gems, shards, itemType, itemValue, active: true }); window.showToast("تم إنشاء الكود", "🎁", "success"); document.getElementById('adm-code-name').value = '';} catch(e) { window.showToast("خطأ", "❌", "error"); }
+   if(!code) return showToast("أدخل الرمز", "⚠️", "error");
+   if(itemType !== 'none' && !itemValue) return showToast("أدخل اسم الهدية أو الرابط", "⚠️", "error");
+   try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { code, gems, shards, itemType, itemValue, active: true }); showToast("تم إنشاء الكود", "🎁", "success"); document.getElementById('adm-code-name').value = '';} catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.renderAdminCodes = function() {
+function renderAdminCodes() {
    const list = document.getElementById('adm-codes-list'); if(!list) return; list.innerHTML = '';
    if(dbCodes.length === 0) return list.innerHTML = '<p class="text-xs text-center text-gray-500 py-2">لا يوجد أكواد</p>';
    dbCodes.forEach(c => {
@@ -873,58 +852,59 @@ window.renderAdminCodes = function() {
    });
 }
 
-window.adminToggleCode = async function(code, state) {
-    try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { active: state }); window.showToast("تم التحديث", "✅", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
+async function adminToggleCode(code, state) {
+    try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'codes', code), { active: state }); showToast("تم التحديث", "✅", "success"); } catch(e) { showToast("خطأ", "❌", "error"); }
 }
 
-window.adminSendGiftToUser = async function(shards, gems) {
+async function adminSendGiftToUser(shards, gems) {
    if(!viewedUser) return;
-   try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', viewedUser.uid), { shards: viewedUser.shards + shards, gems: viewedUser.gems + gems }); window.showToast(`تم الإرسال`, "🎁", "success"); } catch(e) { window.showToast("فشل", "❌", "error"); }
+   try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', viewedUser.uid), { shards: viewedUser.shards + shards, gems: viewedUser.gems + gems }); showToast(`تم الإرسال`, "🎁", "success"); } catch(e) { showToast("فشل", "❌", "error"); }
 }
 
-window.adminGiveBadgeToUser = async function() {
+async function adminGiveBadgeToUser() {
    if(!viewedUser) return;
    const badgeName = document.getElementById('adm-give-badge-name').value.trim();
-   if(!badgeName) return window.showToast("أدخل اسم الوسام", "⚠️", "error");
+   if(!badgeName) return showToast("أدخل اسم الوسام", "⚠️", "error");
    try { 
        let currentBadges = viewedUser.badges || [];
        if(!currentBadges.includes(badgeName)) {
            currentBadges.push(badgeName);
            await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', viewedUser.uid), { badges: currentBadges }); 
-           window.showToast(`تم منح الوسام`, "🏅", "success"); 
+           showToast(`تم منح الوسام`, "🏅", "success"); 
            document.getElementById('adm-give-badge-name').value = '';
        } else {
-           window.showToast(`المستخدم يملك هذا الوسام بالفعل`, "⚠️", "error");
+           showToast(`المستخدم يملك هذا الوسام بالفعل`, "⚠️", "error");
        }
-   } catch(e) { window.showToast("فشل في منح الوسام", "❌", "error"); }
+   } catch(e) { showToast("فشل في منح الوسام", "❌", "error"); }
 }
 
-window.adminResetLeaderboard = async function() {
+async function adminResetLeaderboard() {
    if(confirm("تحذير خطير: هل أنت متأكد من تصفير حسابات جميع اللاعبين إلى المرحلة 1 وصفر نقاط؟")) {
-      window.showToast("جاري التصفير...", "⏳", "info");
+      showToast("جاري التصفير...", "⏳", "info");
       try {
          const proms = allUsers.map(u => { if(u.email !== OWNER_EMAIL) return window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', u.uid), { currentLevel: 1, shards: 0, gems: 0 }); });
-         await Promise.all(proms); window.showToast("تم التصفير بنجاح", "✅", "success");
-      } catch(e) { window.showToast("خطأ", "❌", "error"); }
+         await Promise.all(proms); showToast("تم التصفير بنجاح", "✅", "success");
+      } catch(e) { showToast("خطأ", "❌", "error"); }
    }
 }
 
-// 🔐 تشغيل المستمع للتوثيق وتهيئة اللعبة
-onAuthStateChanged(auth, async (user) => {
-  if (user) { 
-    window.currentUserId = user.uid; 
-    await window.loadPlayerData(user); 
-    window.setupRealtimeListeners(); 
-  } 
-  else { 
-    window.currentUserId = null; 
-    window.resetPlayerData(); 
-  }
-  window.updateUIForAuth();
-  
-  setTimeout(() => {
-      const splashScreen = document.getElementById('screen-splash');
-      if (splashScreen) splashScreen.classList.add('hidden');
-      window.navigateTo('home');
-  }, 800);
-});
+window.initGame = function() {
+    window.onAuthStateChanged(window.firebaseAuth, async (user) => {
+      if (user) { 
+        window.currentUserId = user.uid; 
+        await loadPlayerData(user); 
+        setupRealtimeListeners(); 
+      } 
+      else { 
+        window.currentUserId = null; 
+        resetPlayerData(); 
+      }
+      updateUIForAuth();
+      
+      setTimeout(() => {
+          const splashScreen = document.getElementById('screen-splash');
+          if (splashScreen) splashScreen.classList.add('hidden');
+          navigateTo('home');
+      }, 800);
+    });
+};
