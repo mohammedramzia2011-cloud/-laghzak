@@ -27,9 +27,10 @@ window.DB_PATH = `artifacts/${appId}/public/data/`;
 const OWNER_EMAIL = "mohammedabudayya2011@gmail.com";
 let screenHistory = ['home'], allUsers = [], dbWorlds = [], dbLevels = [], dbShopItems = [], dbCodes = [], dbCrates = [];
 
+// إعطاء الزائر عملات ابتدائية عشان يقدر يجرب
 let defaultPlayer = {
   uid: '', email: '', name: 'زائر', 
-  currentLevel: 1, shards: 0, gems: 0,
+  currentLevel: 1, shards: 100, gems: 50,
   titles: ['مستكشف الألغاز'], equippedTitle: 'مستكشف الألغاز',
   avatars: ['https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak'], equippedAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Lghzak',
   frames: ['بدون إطار'], equippedFrame: 'بدون إطار',
@@ -245,7 +246,7 @@ window.updateUI = function() {
 }
 
 window.savePlayer = async function() {
-  if(!player.uid) return;
+  if(!player.uid) return; // عشان الزائر بدون حساب ما يعلق النظام
   try { await window.updateDoc(window.doc(window.firebaseDb, window.DB_PATH + 'users', player.uid), { 
       name: player.name, currentLevel: player.currentLevel, 
       shards: window.isOwner() ? 0 : player.shards, gems: window.isOwner() ? 0 : player.gems, 
@@ -277,26 +278,23 @@ window.checkDailyReward = function() {
    if(screenHistory[screenHistory.length-1] !== 'home') return;
    const today = new Date().toDateString();
    const banner = document.getElementById('daily-reward-banner');
-   if(player.uid && player.lastDaily !== today) banner.classList.remove('hidden');
+   // الآن بتظهر حتى للزائر عشان يكسب عملات
+   if(player.lastDaily !== today) banner.classList.remove('hidden');
    else banner.classList.add('hidden');
 }
 
-// 🔧 تم إصلاح صندوق المكافأة اليومية (تفادي التعليق)
+// 🔧 إصلاح المكافأة اليومية نهائياً
 window.claimDailyReward = async function() {
-   if(!player.uid) return window.showToast("سجل دخولك أولاً", "🔒", "error");
    const today = new Date().toDateString();
-   if(player.lastDaily === today) return;
+   if(player.lastDaily === today) return window.showToast("لقد استلمت مكافأتك اليوم بالفعل!", "⚠️", "error");
    
    const isGem = Math.random() > 0.8; 
    const amount = isGem ? (Math.floor(Math.random() * 6) + 5) : (Math.floor(Math.random() * 21) + 10);
    if(isGem) player.gems += amount; else player.shards += amount;
    player.lastDaily = today;
    
-   try {
-       await window.savePlayer(); 
-   } catch(e) {
-       console.error("Firebase saving error:", e);
-   }
+   await window.savePlayer();
+   window.updateUI();
 
    document.getElementById('daily-reward-banner').classList.add('hidden');
    window.playSFX('win');
@@ -307,7 +305,12 @@ window.claimDailyReward = async function() {
    }
 }
 
+// 🔧 تنبيه يظهر إذا الأسئلة مش موجودة بقاعدة البيانات
 window.playCurrentLevel = function() {
+  if(!dbLevels || dbLevels.length === 0) {
+      window.playSFX('wrong');
+      return window.showToast("الأسئلة غير موجودة! يجب الدخول للوحة المالك وتوليد المراحل أولاً.", "⚠️", "error");
+  }
   const lvl = dbLevels.find(l => l.num == player.currentLevel);
   if(!lvl) return window.showToast("أنت أسطورة! أنهيت كل المراحل الحالية.", "🚀", "info");
   window.loadLevel(lvl); window.navigateTo('game');
@@ -315,6 +318,9 @@ window.playCurrentLevel = function() {
 
 window.renderWorldsGrid = function() {
    const grid = document.getElementById('worlds-grid'); grid.innerHTML = '';
+   if(dbWorlds.length === 0) {
+       return grid.innerHTML = '<div class="text-center text-gray-400 text-xs py-8 border border-red-500/30 rounded-2xl bg-black/50">لا توجد عوالم! يرجى توليدها من لوحة الإدارة 👑</div>';
+   }
    dbWorlds.forEach(w => {
       const isUnlocked = player.currentLevel >= w.start;
       const bg = isUnlocked ? 'glass-card border-brand-500/30' : 'bg-black/60 border-gray-800 opacity-70 grayscale';
@@ -343,7 +349,6 @@ window.loadLevel = function(lvl) {
   document.getElementById('game-level-num').innerText = `مرحلة ${lvl.num}`; 
   document.getElementById('game-question-text').innerText = lvl.q;
   
-  // 🖼️ دعم إضافة الصورة لمراحل "احزر الصورة"
   const imgElement = document.getElementById('game-question-img');
   if(lvl.img && lvl.img.trim() !== '') {
       imgElement.src = lvl.img;
@@ -754,7 +759,6 @@ window.adminGenerate10Worlds = async function() {
    } catch(e) { window.showToast("خطأ", "❌", "error"); }
 }
 
-// 🪄 تم تعديل دالة التوليد التلقائي لإضافة 100 مرحلة بشكل أذكى (دعم الأسئلة المصورة مستقبلاً)
 window.adminAutoGenerateLevels = async function() {
    const worldId = document.getElementById('adm-auto-lvl-world').value;
    const w = dbWorlds.find(x => x.id === worldId);
@@ -763,7 +767,6 @@ window.adminAutoGenerateLevels = async function() {
       window.showToast("جاري توليد 100 مرحلة... قد يستغرق ثواني", "⏳", "info");
       let proms = [];
       for(let i=w.start; i<=w.end; i++){
-         // إضافة صورة فارغة كتمهيد لوضع الصور لاحقاً لتنويع الأسئلة
          proms.push(window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+i), { 
              num: i, world: w.id, 
              q: `لغز المرحلة ${i} المتصاعد في الصعوبة؟ (تعديل)`, 
@@ -782,14 +785,13 @@ window.adminSaveWorld = async function() {
    try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'worlds', id), { id, name, icon, start, end, rewardTitle, top10Reward, finishersCount: 0 }); window.showToast("تم حفظ العالم", "🌍", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
 }
 
-// 🖼️ دعم إضافة المرحلة مع صورة
 window.adminSaveLevel = async function() {
    const num = parseInt(document.getElementById('adm-lvl-num').value), 
          world = document.getElementById('adm-lvl-world').value, 
          q = document.getElementById('adm-lvl-question').value.trim(), 
          a = document.getElementById('adm-lvl-answer').value.trim(), 
          shards = parseInt(document.getElementById('adm-lvl-shards').value),
-         img = document.getElementById('adm-lvl-img').value.trim(); // قراءة الرابط
+         img = document.getElementById('adm-lvl-img').value.trim(); 
    
    if(!num || !world || !q || !a) return window.showToast("أكمل البيانات", "⚠️", "error");
    try { await window.setDoc(window.doc(window.firebaseDb, window.DB_PATH + 'levels', 'lvl_'+num), { num, world, q, a, shards, img }); window.showToast("تم الإضافة", "➕", "success"); } catch(e) { window.showToast("خطأ", "❌", "error"); }
@@ -907,7 +909,7 @@ window.adminResetLeaderboard = async function() {
    }
 }
 
-// 🔐 تشغيل المستمع للتوثيق
+// 🔐 تشغيل المستمع للتوثيق وتهيئة اللعبة
 onAuthStateChanged(auth, async (user) => {
   if (user) { 
     window.currentUserId = user.uid; 
