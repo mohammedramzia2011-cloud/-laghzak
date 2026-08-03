@@ -1,73 +1,146 @@
+/* إعدادات خطية وإعادة ضبط عامة */
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     font-family: 'Cairo', sans-serif;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background-color: #030712;
 }
 
+/* بطاقات وتصاميم الـ Glassmorphism */
 .glass-card {
-    background: rgba(27, 17, 40, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(27, 17, 40, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 .glass-card-orange {
-    background: rgba(40, 20, 10, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(45, 20, 10, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
+/* أزرار ثلاثية الأبعاد (3D Buttons) مخصصة */
 .btn-3d-orange {
     background: linear-gradient(145deg, #f97316, #ea580c);
-    box-shadow: 0 4px 0 #9a3412, 0 5px 15px rgba(234, 88, 12, 0.4);
-    color: white;
-    transition: all 0.1s;
+    box-shadow: 0 4px 0 #9a3412, 0 6px 20px rgba(234, 88, 12, 0.4);
+    color: #ffffff;
+    transition: all 0.1s ease-in-out;
 }
 .btn-3d-orange:active {
     transform: translateY(4px);
     box-shadow: 0 0 0 #9a3412, 0 2px 5px rgba(234, 88, 12, 0.4);
 }
-.btn-3d-orange:disabled {
-    filter: grayscale(100%);
-    cursor: not-allowed;
-    opacity: 0.7;
-}
 
 .btn-3d-green {
     background: linear-gradient(145deg, #22c55e, #16a34a);
-    box-shadow: 0 4px 0 #14532d, 0 5px 15px rgba(22, 163, 74, 0.4);
-    color: white;
-    transition: all 0.1s;
+    box-shadow: 0 4px 0 #14532d, 0 6px 20px rgba(22, 163, 74, 0.4);
+    color: #ffffff;
+    transition: all 0.1s ease-in-out;
 }
-.btn-3d-green:active { transform: translateY(4px); box-shadow: 0 0 0 #14532d; }
+.btn-3d-green:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #14532d;
+}
 
 .btn-3d-purple {
     background: linear-gradient(145deg, #a855f7, #9333ea);
-    box-shadow: 0 4px 0 #581c87;
-    color: white;
+    box-shadow: 0 4px 0 #581c87, 0 6px 20px rgba(147, 51, 234, 0.4);
+    color: #ffffff;
+    transition: all 0.1s ease-in-out;
 }
-.btn-3d-purple:active { transform: translateY(4px); box-shadow: 0 0 0 #581c87; }
+.btn-3d-purple:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #581c87;
+}
 
+.btn-3d-cyan {
+    background: linear-gradient(145deg, #06b6d4, #0891b2);
+    box-shadow: 0 4px 0 #164e63, 0 6px 20px rgba(8, 145, 178, 0.4);
+    color: #ffffff;
+    transition: all 0.1s ease-in-out;
+}
+.btn-3d-cyan:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #164e63;
+}
+
+/* تصميم خانات الإجابة والأزرار داخل اللعبة */
 .letter-slot {
-    width: 2.5rem; height: 2.5rem;
-    background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; font-weight: 900; color: #f97316; cursor: pointer; transition: 0.2s;
+    width: 2.6rem;
+    height: 2.6rem;
+    background: rgba(0, 0, 0, 0.65);
+    border: 2px solid rgba(249, 115, 22, 0.4);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #fb923c;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .letter-btn {
-    width: 2.2rem; height: 2.2rem;
+    width: 2.3rem;
+    height: 2.3rem;
     background: linear-gradient(145deg, #374151, #1f2937);
-    border-radius: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 3px 0 #111827; display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; font-weight: 800; color: white; cursor: pointer;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 3px 0 #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.1s ease;
 }
-.letter-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #111827; }
-.hidden-letter { visibility: hidden; opacity: 0; }
+.letter-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #111827;
+}
 
-.animate-float { animation: float 3s ease-in-out infinite; }
+.hidden-letter {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* انيميشن وتأثيرات بصرية */
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
 @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-12px); }
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 2s infinite alternate;
+}
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
+    100% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.8); }
+}
+
+/* شريط التمرير المخصص */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(249, 115, 22, 0.5);
+    border-radius: 10px;
 }
